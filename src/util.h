@@ -15,3 +15,5 @@ typedef size_t usize;
 
 typedef float f32;
 typedef double f64;
+
+void showerr(char const *fmt, ...);
