@@ -4,7 +4,7 @@ typedef struct a_argdata
 {
 	char const *files[O_MAXFILES];
 	usize nfiles;
-	bool create, readonly;
+	bool create;
 } a_argdata;
 
 extern a_argdata a_args;

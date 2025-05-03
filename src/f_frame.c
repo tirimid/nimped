@@ -308,7 +308,7 @@ f_write(f_frame *f, e_char *data, u32 pos, usize n)
 	}
 	
 	memmove(&f->buf[pos + n], &f->buf[pos], sizeof(e_char) * (f->len - pos));
-	memcpy(&f->buf[n], data, sizeof(e_char) * n);
+	memcpy(&f->buf[pos], data, sizeof(e_char) * n);
 	f->len += n;
 	f->flags |= F_UNSAVED;
 	
@@ -341,18 +341,12 @@ f_write(f_frame *f, e_char *data, u32 pos, usize n)
 void
 f_erase(f_frame *f, u32 lb, u32 ub)
 {
-	(void)f;
-	(void)lb;
-	(void)ub;
-	
 	// TODO: implement.
 }
 
 void
 f_undo(f_frame *f)
 {
-	(void)f;
-	
 	// TODO: implement.
 }
 

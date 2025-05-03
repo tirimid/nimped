@@ -52,7 +52,7 @@ r_quit(void)
 	free(r_cellchars);
 	free(r_cellattrs);
 	
-	printf("\x1b[?25h\x1b[0m");
+	printf("\x1b[?25h\x1b[0m\x1b[2J\x1b[H");
 	
 	if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &r_oldtermios))
 	{

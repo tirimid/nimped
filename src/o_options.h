@@ -55,6 +55,14 @@ extern e_char o_bmvend[];
 extern e_char o_bquit[];
 extern e_char o_bnext[];
 extern e_char o_bprev[];
+extern e_char o_bwritemode[];
+extern e_char o_bdelfront[];
+extern e_char o_bdelback[];
+extern e_char o_bnewline[];
+extern e_char o_bundo[];
+extern e_char o_bnewframe[];
+extern e_char o_bkillframe[];
+extern e_char o_bsave[];
 
 // dynamic options.
 typedef struct o_options

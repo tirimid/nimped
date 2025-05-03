@@ -9,6 +9,13 @@ static void b_mvend(void);
 static void b_quit(void);
 static void b_next(void);
 static void b_prev(void);
+static void b_delfront(void);
+static void b_delback(void);
+static void b_newline(void);
+static void b_undo(void);
+static void b_newframe(void);
+static void b_killframe(void);
+static void b_save(void);
 
 void
 b_installbase(void)
@@ -23,7 +30,27 @@ b_installbase(void)
 	i_bind(o_bquit, b_quit);
 	i_bind(o_bnext, b_next);
 	i_bind(o_bprev, b_prev);
+	i_bind(o_bwritemode, b_installwrite);
+	i_bind(o_bundo, b_undo);
+	i_bind(o_bnewframe, b_newframe);
+	i_bind(o_bkillframe, b_killframe);
+	i_bind(o_bsave, b_save);
 	i_organize();
+	
+	w_state.writeinput = false;
+}
+
+void
+b_installwrite(void)
+{
+	i_unbind();
+	i_bind(o_bquit, b_installbase);
+	i_bind(o_bdelfront, b_delfront);
+	i_bind(o_bdelback, b_delback);
+	i_bind(o_bnewline, b_newline);
+	i_organize();
+	
+	w_state.writeinput = true;
 }
 
 static void
@@ -110,4 +137,50 @@ static void
 b_prev(void)
 {
 	w_state.curframe = w_state.curframe == 0 ? w_state.nframes - 1 : w_state.curframe - 1;
+}
+
+static void
+b_delfront(void)
+{
+	// TODO: implement.
+}
+
+static void
+b_delback(void)
+{
+	// TODO: implement.
+}
+
+static void
+b_newline(void)
+{
+	// TODO: add support for features like unfolding smart parens.
+	f_frame *f = &w_state.frames[w_state.curframe];
+	f_writech(f, e_fromcodepoint('\n'), f->csr);
+	++f->csr;
+}
+
+static void
+b_undo(void)
+{
+	f_frame *f = &w_state.frames[w_state.curframe];
+	f_undo(f);
+}
+
+static void
+b_newframe(void)
+{
+	// TODO: implement.
+}
+
+static void
+b_killframe(void)
+{
+	// TODO: implement.
+}
+
+static void
+b_save(void)
+{
+	// TODO: implement.
 }

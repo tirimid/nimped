@@ -8,7 +8,7 @@ i32
 a_parse(i32 argc, char const *argv[])
 {
 	i32 ch;
-	while (ch = getopt(argc, (char *const *)argv, "chr"), ch != -1)
+	while (ch = getopt(argc, (char *const *)argv, "ch"), ch != -1)
 	{
 		switch (ch)
 		{
@@ -18,18 +18,9 @@ a_parse(i32 argc, char const *argv[])
 		case 'h':
 			a_usage(argv[0]);
 			exit(0);
-		case 'r':
-			a_args.readonly = true;
-			break;
 		default:
 			return 1;
 		}
-	}
-	
-	if (a_args.create && a_args.readonly)
-	{
-		showerr("args: cannot specify -c and -r at the same time!");
-		return 1;
 	}
 	
 	for (; optind < argc; ++optind)
@@ -70,8 +61,7 @@ a_usage(char const *name)
 		"\n"
 		"Options:\n"
 		"\t-c  Create files if they don't exist\n"
-		"\t-h  Display this help information\n"
-		"\t-r  Open files as read-only\n",
+		"\t-h  Display this help information\n",
 		name
 	);
 }

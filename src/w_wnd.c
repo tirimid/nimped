@@ -2,6 +2,8 @@
 
 w_wndstate w_state;
 
+static bool w_iswritable(e_char ch);
+
 i32
 w_init(void)
 {
@@ -35,12 +37,14 @@ w_loop(void)
 		r_present();
 		
 		e_char k = i_readkey();
-		if (k.codepoint == E_INVALIDCODEPOINT)
+		if (w_state.writeinput
+			&& k.codepoint != E_INVALIDCODEPOINT
+			&& w_iswritable(k))
 		{
-			continue;
+			f_frame *f = &w_state.frames[w_state.curframe];
+			f_writech(f, k, f->csr);
+			++f->csr;
 		}
-		
-		// TODO: handle key input.
 	}
 }
 
@@ -87,4 +91,10 @@ w_render(void)
 		f_compbounds(&w_state.frames[i], w, h);
 		f_render(&w_state.frames[i], x, y, w, h, i == w_state.curframe);
 	}
+}
+
+static bool
+w_iswritable(e_char ch)
+{
+	return ch.codepoint == '\t' || e_isprint(ch);
 }

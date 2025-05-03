@@ -15,6 +15,12 @@
 #define O_KFN(n) O_K(27), O_K(79), O_K(79 + n)
 #define O_KMETA(k) O_K(27), O_K(k)
 
+typedef struct o_namedcolor
+{
+	char const *name;
+	u8 col;
+} o_namedcolor;
+
 // keybind options.
 e_char o_bmvleft[] = {O_K('h'), O_KEND};
 e_char o_bmvright[] = {O_K('l'), O_KEND};
@@ -25,13 +31,56 @@ e_char o_bmvend[] = {O_K('e'), O_KEND};
 e_char o_bquit[] = {O_KCTL('x'), O_KEND};
 e_char o_bnext[] = {O_K('n'), O_KEND};
 e_char o_bprev[] = {O_K('p'), O_KEND};
+e_char o_bwritemode[] = {O_K('i'), O_KEND};
+e_char o_bdelfront[] = {O_KCTL('d'), O_KEND};
+e_char o_bdelback[] = {O_K(127), O_KEND};
+e_char o_bnewline[] = {O_K(13), O_KEND};
+e_char o_bundo[] = {O_K('u'), O_KEND};
+e_char o_bnewframe[] = {O_KCTL('n'), O_KEND};
+e_char o_bkillframe[] = {O_KCTL('k'), O_KEND};
+e_char o_bsave[] = {O_KCTL('s'), O_KEND};
 
 o_options o_opts;
 
 static FILE *o_openconf(char const *file);
 static i32 o_getraw(char const *name, FILE *fp, char const *key, OUT char val[]);
 static i32 o_getu32(char const *name, FILE *fp, char const *key, OUT u32 *val);
-static i32 o_getu8(char const *name, FILE *fp, char const *key, OUT u8 *val);
+static i32 o_getcolor(char const *name, FILE *fp, char const *key, OUT u8 *val);
+
+static o_namedcolor o_namedcolors[] =
+{
+	// these colors will be usable as named palette colors in config.
+	// add the palettes of your favorite themes here.
+	{"@gbd.bg", 235},
+	{"@gbd.darkred", 124},
+	{"@gbd.darkgreen", 106},
+	{"@gbd.darkyellow", 172},
+	{"@gbd.darkblue", 66},
+	{"@gbd.darkpurple", 132},
+	{"@gbd.darkaqua", 72},
+	{"@gbd.lightgray", 246},
+	{"@gbd.darkgray", 245},
+	{"@gbd.lightred", 167},
+	{"@gbd.lightgreen", 142},
+	{"@gbd.lightyellow", 214},
+	{"@gbd.lightblue", 109},
+	{"@gbd.lightpurple", 175},
+	{"@gbd.lightaqua", 108},
+	{"@gbd.fg", 223},
+	{"@gbd.bg0_h", 234},
+	{"@gbd.bg1", 237},
+	{"@gbd.bg2", 239},
+	{"@gbd.bg3", 241},
+	{"@gbd.bg4", 243},
+	{"@gbd.darkorange", 166},
+	{"@gbd.bg0_s", 236},
+	{"@gbd.fg4", 246},
+	{"@gbd.fg3", 248},
+	{"@gbd.fg2", 250},
+	{"@gbd.fg1", 223},
+	{"@gbd.fg0", 229},
+	{"@gbd.lightorange", 208}
+};
 
 i32
 o_parse(void)
@@ -48,24 +97,24 @@ o_parse(void)
 		|| o_getu32(O_MAINCONF, fp, "rgutter", &o_opts.rgutter)
 		|| o_getu32(O_MAINCONF, fp, "margin", &o_opts.margin)
 		|| o_getu32(O_MAINCONF, fp, "tab", &o_opts.tab)
-		|| o_getu8(O_MAINCONF, fp, "globalfg", &o_opts.globalfg)
-		|| o_getu8(O_MAINCONF, fp, "globalbg", &o_opts.globalbg)
-		|| o_getu8(O_MAINCONF, fp, "wndfg", &o_opts.wndfg)
-		|| o_getu8(O_MAINCONF, fp, "wndbg", &o_opts.wndbg)
-		|| o_getu8(O_MAINCONF, fp, "curwndfg", &o_opts.curwndfg)
-		|| o_getu8(O_MAINCONF, fp, "curwndbg", &o_opts.curwndbg)
-		|| o_getu8(O_MAINCONF, fp, "normfg", &o_opts.normfg)
-		|| o_getu8(O_MAINCONF, fp, "normbg", &o_opts.normbg)
-		|| o_getu8(O_MAINCONF, fp, "linumfg", &o_opts.linumfg)
-		|| o_getu8(O_MAINCONF, fp, "linumbg", &o_opts.linumbg)
-		|| o_getu8(O_MAINCONF, fp, "marginfg", &o_opts.marginfg)
-		|| o_getu8(O_MAINCONF, fp, "marginbg", &o_opts.marginbg)
-		|| o_getu8(O_MAINCONF, fp, "csrfg", &o_opts.csrfg)
-		|| o_getu8(O_MAINCONF, fp, "csrbg", &o_opts.csrbg)
-		|| o_getu8(O_MAINCONF, fp, "hlfg", &o_opts.hlfg)
-		|| o_getu8(O_MAINCONF, fp, "hlbg", &o_opts.hlbg)
-		|| o_getu8(O_MAINCONF, fp, "linumhlfg", &o_opts.linumhlfg)
-		|| o_getu8(O_MAINCONF, fp, "linumhlbg", &o_opts.linumhlbg))
+		|| o_getcolor(O_MAINCONF, fp, "globalfg", &o_opts.globalfg)
+		|| o_getcolor(O_MAINCONF, fp, "globalbg", &o_opts.globalbg)
+		|| o_getcolor(O_MAINCONF, fp, "wndfg", &o_opts.wndfg)
+		|| o_getcolor(O_MAINCONF, fp, "wndbg", &o_opts.wndbg)
+		|| o_getcolor(O_MAINCONF, fp, "curwndfg", &o_opts.curwndfg)
+		|| o_getcolor(O_MAINCONF, fp, "curwndbg", &o_opts.curwndbg)
+		|| o_getcolor(O_MAINCONF, fp, "normfg", &o_opts.normfg)
+		|| o_getcolor(O_MAINCONF, fp, "normbg", &o_opts.normbg)
+		|| o_getcolor(O_MAINCONF, fp, "linumfg", &o_opts.linumfg)
+		|| o_getcolor(O_MAINCONF, fp, "linumbg", &o_opts.linumbg)
+		|| o_getcolor(O_MAINCONF, fp, "marginfg", &o_opts.marginfg)
+		|| o_getcolor(O_MAINCONF, fp, "marginbg", &o_opts.marginbg)
+		|| o_getcolor(O_MAINCONF, fp, "csrfg", &o_opts.csrfg)
+		|| o_getcolor(O_MAINCONF, fp, "csrbg", &o_opts.csrbg)
+		|| o_getcolor(O_MAINCONF, fp, "hlfg", &o_opts.hlfg)
+		|| o_getcolor(O_MAINCONF, fp, "hlbg", &o_opts.hlbg)
+		|| o_getcolor(O_MAINCONF, fp, "linumhlfg", &o_opts.linumhlfg)
+		|| o_getcolor(O_MAINCONF, fp, "linumhlbg", &o_opts.linumhlbg))
 	{
 		fclose(fp);
 		return 1;
@@ -173,7 +222,7 @@ o_getu32(char const *name, FILE *fp, char const *key, OUT u32 *val)
 }
 
 static i32
-o_getu8(char const *name, FILE *fp, char const *key, OUT u8 *val)
+o_getcolor(char const *name, FILE *fp, char const *key, OUT u8 *val)
 {
 	char buf[O_CONFVALLEN] = {0};
 	if (o_getraw(name, fp, key, buf))
@@ -181,11 +230,27 @@ o_getu8(char const *name, FILE *fp, char const *key, OUT u8 *val)
 		return 1;
 	}
 	
+	// named color palettes.
+	if (buf[0] == '@')
+	{
+		for (usize i = 0; i < sizeof(o_namedcolors) / sizeof(o_namedcolors[0]); ++i)
+		{
+			if (!strcmp(buf, o_namedcolors[i].name))
+			{
+				*val = o_namedcolors[i].col;
+				return 0;
+			}
+		}
+		
+		showerr("options: unknown color value for %s in %s!", key, name);
+		return 1;
+	}
+	
 	errno = 0;
 	unsigned long long ull = strtoull(buf, NULL, 0);
 	if (errno || ull > UINT8_MAX)
 	{
-		showerr("options: invalid u8 value for %s in %s!", key, name);
+		showerr("options: invalid color value for %s in %s!", key, name);
 		return 1;
 	}
 	

@@ -7,6 +7,7 @@ typedef struct w_wndstate
 	e_char *clipboard;
 	u32 clipboardlen;
 	bool running;
+	bool writeinput;
 } w_wndstate;
 
 extern w_wndstate w_state;
