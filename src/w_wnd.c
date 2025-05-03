@@ -47,17 +47,21 @@ w_loop(void)
 void
 w_render(void)
 {
-	r_clear(e_fromcodepoint(' '), (r_attr){o_opts.globalfg, o_opts.globalbg});
-	
 	u32 rw, rh;
 	r_winsize(&rw, &rh);
 	
+	r_clear(e_fromcodepoint(' '), (r_attr){o_opts.globalfg, o_opts.globalbg});
+	
+	// mono frame.
 	if (w_state.nframes == 1)
 	{
+		f_compbounds(&w_state.frames[0], rw, rh);
 		f_render(&w_state.frames[0], 0, 0, rw, rh, !w_state.curframe);
 		return;
 	}
 	
+	// master frame.
+	f_compbounds(&w_state.frames[0], o_opts.masternum * rw / o_opts.masterdenom, rh);
 	f_render(
 		&w_state.frames[0],
 		0,
@@ -66,6 +70,8 @@ w_render(void)
 		rh,
 		!w_state.curframe
 	);
+	
+	// secondary frames.
 	for (usize i = 1; i < w_state.nframes; ++i)
 	{
 		u32 h = rh / (w_state.nframes - 1);
@@ -78,6 +84,7 @@ w_render(void)
 			h = rh - y;
 		}
 		
+		f_compbounds(&w_state.frames[i], w, h);
 		f_render(&w_state.frames[i], x, y, w, h, i == w_state.curframe);
 	}
 }

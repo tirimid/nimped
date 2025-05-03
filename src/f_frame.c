@@ -129,7 +129,12 @@ f_render(f_frame const *f, u32 x, u32 y, u32 w, u32 h, bool active)
 		startline += f->buf[i].codepoint == '\n';
 	}
 	
-	u32 lastline = startline + h - 1;
+	u32 lastline = 1;
+	for (u32 i = 0; i < f->len; ++i)
+	{
+		lastline += f->buf[i].codepoint == '\n';
+	}
+	
 	u32 linumlen = 0;
 	while (lastline)
 	{
@@ -173,18 +178,21 @@ f_render(f_frame const *f, u32 x, u32 y, u32 w, u32 h, bool active)
 	// render frame contents and find cursor pos.
 	u32 cx = 0, cy = 0;
 	u32 csrx = -1, csry = -1;
+	u32 curline = startline;
 	for (u32 i = f->start; i < f->len; ++i)
 	{
 		if (!cx)
 		{
 			char linum[32];
-			snprintf(linum, sizeof(linum), "%u", startline + cy);
+			snprintf(linum, sizeof(linum), "%u", curline);
 			
 			u32 pad = o_opts.lgutter + linumlen - strlen(linum);
 			for (u32 j = 0; linum[j]; ++j)
 			{
 				r_putch(e_fromcodepoint(linum[j]), x + pad + j, y + cy + 1);
 			}
+			
+			++curline;
 		}
 		
 		if (leftpad + cx >= w)
@@ -216,17 +224,23 @@ f_render(f_frame const *f, u32 x, u32 y, u32 w, u32 h, bool active)
 			break;
 		default:
 			cw = 1;
+			r_put(
+				e_isprint(f->buf[i]) ? f->buf[i] : e_fromcodepoint(E_REPLACECODEPOINT),
+				(r_attr){o_opts.normfg, o_opts.normbg},
+				x + leftpad + cx,
+				y + cy + 1
+			);
 			break;
 		}
 		
-		r_put(f->buf[i], (r_attr){o_opts.normfg, o_opts.normbg}, x + leftpad + cx, y + cy + 1);
 		cx += cw;
 	}
 	
 	csrx = csrx == (u32)-1 ? cx : csrx;
 	csry = csry == (u32)-1 ? cy : csry;
 	
-	// render cursor and row / column highlights.
+	// render cursor and row highlights.
+	r_fillattr((r_attr){o_opts.linumhlfg, o_opts.linumhlbg}, x, y + csry + 1, leftpad, 1);
 	r_fillattr((r_attr){o_opts.hlfg, o_opts.hlbg}, x + leftpad, y + csry + 1, w - leftpad, 1);
 	r_putattr((r_attr){o_opts.csrfg, o_opts.csrbg}, x + leftpad + csrx, y + csry + 1);
 }
@@ -407,4 +421,84 @@ f_loadcsr(f_frame *f)
 	}
 	
 	f->csr = i;
+}
+
+void
+f_compbounds(f_frame *f, u32 w, u32 h)
+{
+	if (f->csr < f->start)
+	{
+		f->start = f->csr;
+		while (f->start > 0 && f->buf[f->start - 1].codepoint != '\n')
+		{
+			--f->start;
+		}
+		return;
+	}
+	
+	u32 lastline = 1;
+	for (u32 i = 0; i < f->len; ++i)
+	{
+		lastline += f->buf[i].codepoint == '\n';
+	}
+	
+	u32 linumlen = 0;
+	while (lastline)
+	{
+		++linumlen;
+		lastline /= 10;
+	}
+	
+	u32 cx = 0, cy = 0;
+	for (usize i = f->start; i < f->csr; ++i)
+	{
+		if (o_opts.lgutter + o_opts.rgutter + linumlen + cx >= w)
+		{
+			cx = 0;
+			++cy;
+		}
+		
+		u32 cw;
+		switch (f->buf[i].codepoint)
+		{
+		case '\n':
+			cx = 0;
+			++cy;
+			continue;
+		case '\t':
+			cw = o_opts.tab - cx % o_opts.tab;
+			break;
+		default:
+			cw = 1;
+			break;
+		}
+		
+		cx += cw;
+	}
+	
+	for (cx = 0; cy + 1 >= h; ++f->start)
+	{
+		if (o_opts.lgutter + o_opts.rgutter + linumlen + cx >= w)
+		{
+			cx = 0;
+			--cy;
+		}
+		
+		u32 cw;
+		switch (f->buf[f->start].codepoint)
+		{
+		case '\n':
+			cx = 0;
+			--cy;
+			continue;
+		case '\t':
+			cw = o_opts.tab - cx % o_opts.tab;
+			break;
+		default:
+			cw = 1;
+			break;
+		}
+		
+		cx += cw;
+	}
 }

@@ -7,6 +7,8 @@ static void b_mvdown(void);
 static void b_mvstart(void);
 static void b_mvend(void);
 static void b_quit(void);
+static void b_next(void);
+static void b_prev(void);
 
 void
 b_installbase(void)
@@ -19,6 +21,8 @@ b_installbase(void)
 	i_bind(o_bmvstart, b_mvstart);
 	i_bind(o_bmvend, b_mvend);
 	i_bind(o_bquit, b_quit);
+	i_bind(o_bnext, b_next);
+	i_bind(o_bprev, b_prev);
 	i_organize();
 }
 
@@ -94,4 +98,16 @@ static void
 b_quit(void)
 {
 	w_state.running = false;
+}
+
+static void
+b_next(void)
+{
+	w_state.curframe = w_state.curframe == w_state.nframes - 1 ? 0 : w_state.curframe + 1;
+}
+
+static void
+b_prev(void)
+{
+	w_state.curframe = w_state.curframe == 0 ? w_state.nframes - 1 : w_state.curframe - 1;
 }

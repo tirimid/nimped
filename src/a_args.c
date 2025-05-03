@@ -43,6 +43,18 @@ a_parse(i32 argc, char const *argv[])
 		a_args.files[a_args.nfiles++] = argv[optind];
 	}
 	
+	for (usize i = 0; i < a_args.nfiles; ++i)
+	{
+		for (usize j = i + 1; j < a_args.nfiles; ++j)
+		{
+			if (ispathsame(a_args.files[i], a_args.files[j]))
+			{
+				showerr("args: cannot open the same file twice - %s!", a_args.files[i]);
+				return 1;
+			}
+		}
+	}
+	
 	return 0;
 }
 

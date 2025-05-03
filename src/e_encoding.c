@@ -205,3 +205,24 @@ e_fputch(e_char ch, FILE *fp)
 	
 	return 0;
 }
+
+bool
+e_isprint(e_char ch)
+{
+	if (ch.codepoint <= 0x1f
+		|| (ch.codepoint >= 0x7f && ch.codepoint <= 0x9f)
+		|| (ch.codepoint >= 0x2028 && ch.codepoint <= 0x2029)
+		|| (ch.codepoint >= 0xe0000 && ch.codepoint <= 0xe007f)
+		|| (ch.codepoint >= 0xfff9 && ch.codepoint <= 0xfffb)
+		|| ch.codepoint == 0x61c
+		|| (ch.codepoint >= 0x200e && ch.codepoint <= 0x200f)
+		|| (ch.codepoint >= 0x202a && ch.codepoint <= 0x202e)
+		|| (ch.codepoint >= 0x2066 && ch.codepoint <= 0x2069))
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}

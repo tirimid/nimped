@@ -55,3 +55,4 @@ void f_undo(f_frame *f);
 void f_breakhist(f_frame *f);
 void f_savecsr(f_frame *f);
 void f_loadcsr(f_frame *f);
+void f_compbounds(f_frame *f, u32 w, u32 h);

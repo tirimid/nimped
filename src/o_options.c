@@ -23,6 +23,8 @@ e_char o_bmvdown[] = {O_K('j'), O_KEND};
 e_char o_bmvstart[] = {O_K('a'), O_KEND};
 e_char o_bmvend[] = {O_K('e'), O_KEND};
 e_char o_bquit[] = {O_KCTL('x'), O_KEND};
+e_char o_bnext[] = {O_K('n'), O_KEND};
+e_char o_bprev[] = {O_K('p'), O_KEND};
 
 o_options o_opts;
 
@@ -61,7 +63,9 @@ o_parse(void)
 		|| o_getu8(O_MAINCONF, fp, "csrfg", &o_opts.csrfg)
 		|| o_getu8(O_MAINCONF, fp, "csrbg", &o_opts.csrbg)
 		|| o_getu8(O_MAINCONF, fp, "hlfg", &o_opts.hlfg)
-		|| o_getu8(O_MAINCONF, fp, "hlbg", &o_opts.hlbg))
+		|| o_getu8(O_MAINCONF, fp, "hlbg", &o_opts.hlbg)
+		|| o_getu8(O_MAINCONF, fp, "linumhlfg", &o_opts.linumhlfg)
+		|| o_getu8(O_MAINCONF, fp, "linumhlbg", &o_opts.linumhlbg))
 	{
 		fclose(fp);
 		return 1;

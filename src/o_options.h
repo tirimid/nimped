@@ -53,6 +53,8 @@ extern e_char o_bmvdown[];
 extern e_char o_bmvstart[];
 extern e_char o_bmvend[];
 extern e_char o_bquit[];
+extern e_char o_bnext[];
+extern e_char o_bprev[];
 
 // dynamic options.
 typedef struct o_options
@@ -69,6 +71,7 @@ typedef struct o_options
 	u8 marginfg, marginbg;
 	u8 csrfg, csrbg;
 	u8 hlfg, hlbg;
+	u8 linumhlfg, linumhlbg;
 } o_options;
 
 extern o_options o_opts;

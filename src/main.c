@@ -15,6 +15,7 @@
 // system dependencies.
 #include <pwd.h>
 #include <sys/ioctl.h>
+#include <sys/stat.h>
 #include <termios.h>
 #include <unistd.h>
 

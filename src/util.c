@@ -13,3 +13,27 @@ showerr(char const *fmt, ...)
 	
 	va_end(args);
 }
+
+u64
+fileid(char const *path, bool deref)
+{
+	int (*statfn[])(char const *restrict, struct stat *restrict) =
+	{
+		lstat,
+		stat
+	};
+	
+	struct stat stat;
+	if (statfn[deref](path, &stat))
+	{
+		return 1;
+	}
+	
+	return stat.st_ino;
+}
+
+bool
+ispathsame(char const *patha, char const *pathb)
+{
+	return fileid(patha, true) == fileid(pathb, true);
+}
