@@ -72,6 +72,46 @@ r_clear(e_char ch, r_attr a)
 }
 
 void
+r_fillch(e_char ch, u32 x, u32 y, u32 w, u32 h)
+{
+	if (x >= r_w || y >= r_h)
+	{
+		return;
+	}
+	
+	w = x + w >= r_w ? r_w - x : w;
+	h = y + h >= r_h ? r_h - y : h;
+	
+	for (u32 cx = x; cx < x + w; ++cx)
+	{
+		for (u32 cy = y; cy < y + h; ++cy)
+		{
+			r_cellchars[r_w * cy + cx] = ch;
+		}
+	}
+}
+
+void
+r_fillattr(r_attr a, u32 x, u32 y, u32 w, u32 h)
+{
+	if (x >= r_w || y >= r_h)
+	{
+		return;
+	}
+	
+	w = x + w >= r_w ? r_w - x : w;
+	h = y + h >= r_h ? r_h - y : h;
+	
+	for (u32 cx = x; cx < x + w; ++cx)
+	{
+		for (u32 cy = y; cy < y + h; ++cy)
+		{
+			r_cellattrs[r_w * cy + cx] = a;
+		}
+	}
+}
+
+void
 r_fill(e_char ch, r_attr a, u32 x, u32 y, u32 w, u32 h)
 {
 	if (x >= r_w || y >= r_h)
@@ -170,4 +210,6 @@ r_sigwinch(int arg)
 	
 	r_cellchars = reallocarray(r_cellchars, r_w * r_h, sizeof(e_char));
 	r_cellattrs = reallocarray(r_cellattrs, r_w * r_h, sizeof(r_attr));
+	
+	printf("\r");
 }

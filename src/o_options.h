@@ -8,21 +8,25 @@
 
 // functional options.
 #define O_MAXFILES 8
-#define O_CONFDIR ".nimped"
-#define O_LANGDIR ".nimped/lang"
+#define O_CONFDIR ".config/nimped"
+#define O_LANGDIR "lang"
 #define O_MAINCONF "nimped.conf"
+
+// input options.
+#define O_MAXBINDLEN 16
+#define O_MAXBINDS 128
 
 // frame options.
 #define O_SCRATCHNAME "-scratch-"
 #define O_GREETERTEXT \
 	"nimped - (n)ew and (imp)roved text (ed)itor\n" \
 	"\n" \
-	"       _                          _\n" \
-	" _ __ (_)_ __ ___  _ __   ___  __| |\n" \
-	"| '_ \\| | '_ ` _ \\| '_ \\ / _ \\/ _` |\n" \
-	"| | | | | | | | | | |_) |  __/ (_| |\n" \
-	"|_| |_|_|_| |_| |_| .__/ \\___|\\__,_|\n" \
-	"                  |_|\n" \
+	"           _                          _\n" \
+	"     _ __ (_)_ __ ___  _ __   ___  __| |\n" \
+	"    | '_ \\| | '_ ` _ \\| '_ \\ / _ \\/ _` |\n" \
+	"    | | | | | | | | | | |_) |  __/ (_| |\n" \
+	"    |_| |_|_|_| |_| |_| .__/ \\___|\\__,_|\n" \
+	"                      |_|\n" \
 	"\n" \
 	"Welcome to the new and improved text editor by Tirimid - nimped.\n" \
 	"\n" \
@@ -38,10 +42,33 @@
 	"\n" \
 	"(The greeter logo seen above was generated with the use of Figlet)\n"
 
+// visual options.
+#define O_MARGINCHAR '|'
+
+// keybind options.
+extern e_char o_bmvleft[];
+extern e_char o_bmvright[];
+extern e_char o_bmvup[];
+extern e_char o_bmvdown[];
+extern e_char o_bmvstart[];
+extern e_char o_bmvend[];
+extern e_char o_bquit[];
+
 // dynamic options.
 typedef struct o_options
 {
 	u32 masternum, masterdenom;
+	u32 lgutter, rgutter;
+	u32 margin;
+	u32 tab;
+	u8 globalfg, globalbg;
+	u8 wndfg, wndbg;
+	u8 curwndfg, curwndbg;
+	u8 normfg, normbg;
+	u8 linumfg, linumbg;
+	u8 marginfg, marginbg;
+	u8 csrfg, csrbg;
+	u8 hlfg, hlbg;
 } o_options;
 
 extern o_options o_opts;

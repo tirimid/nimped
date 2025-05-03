@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 // standard library.
+#include <ctype.h>
+#include <errno.h>
+#include <limits.h>
 #include <signal.h>
 #include <stdarg.h>
 #include <stdbool.h>
@@ -10,23 +13,28 @@
 #include <string.h>
 
 // system dependencies.
+#include <pwd.h>
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <unistd.h>
 
 // project headers.
 #include "util.h"
+#include "e_encoding.h"
 #include "o_options.h"
 #include "a_args.h"
-#include "e_encoding.h"
+#include "i_input.h"
 #include "r_render.h"
 #include "f_frame.h"
 #include "w_wnd.h"
+#include "b_binds.h"
 
 // project source.
 #include "a_args.c"
+#include "b_binds.c"
 #include "e_encoding.c"
 #include "f_frame.c"
+#include "i_input.c"
 #include "o_options.c"
 #include "r_render.c"
 #include "util.c"
@@ -55,6 +63,8 @@ main(int argc, char const *argv[])
 	{
 		return 1;
 	}
+	
+	w_loop();
 	
 	return 0;
 }

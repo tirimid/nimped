@@ -97,9 +97,138 @@ f_destroy(f_frame *f)
 }
 
 void
-f_render(f_frame const *f, u32 x, u32 y, u32 w, u32 h)
+f_render(f_frame const *f, u32 x, u32 y, u32 w, u32 h, bool active)
 {
-	// TODO: implement.
+	// render window top bar.
+	r_attr atop = active ? (r_attr){o_opts.curwndfg, o_opts.curwndbg} : (r_attr){o_opts.wndfg, o_opts.wndbg};
+	r_fill(e_fromcodepoint(' '), atop, x, y, w, 1);
+	
+	usize namelen;
+	e_char *name = e_fromstr(&namelen, f->src ? f->src : O_SCRATCHNAME);
+	
+	{
+		u32 i;
+		for (i = 0; i < namelen && i < w; ++i)
+		{
+			r_putch(name[i], x + i, y);
+		}
+		
+		if (f->flags & F_UNSAVED)
+		{
+			i -= i >= w;
+			r_putch(e_fromcodepoint('*'), x + i, y);
+		}
+	}
+	
+	free(name);
+	
+	// fill frame and gutter.
+	u32 startline = 1;
+	for (u32 i = 0; i < f->start; ++i)
+	{
+		startline += f->buf[i].codepoint == '\n';
+	}
+	
+	u32 lastline = startline + h - 1;
+	u32 linumlen = 0;
+	while (lastline)
+	{
+		++linumlen;
+		lastline /= 10;
+	}
+	
+	r_fill(
+		e_fromcodepoint(' '),
+		(r_attr){o_opts.linumfg, o_opts.linumbg},
+		x,
+		y + 1,
+		linumlen + o_opts.lgutter + o_opts.rgutter,
+		h - 1
+	);
+	
+	r_fill(
+		e_fromcodepoint(' '),
+		(r_attr){o_opts.normfg, o_opts.normbg},
+		x + linumlen + o_opts.lgutter + o_opts.rgutter,
+		y + 1,
+		w - linumlen + o_opts.lgutter + o_opts.rgutter,
+		h - 1
+	);
+	
+	u32 leftpad = o_opts.lgutter + linumlen + o_opts.rgutter;
+	
+	// render margin.
+	if (leftpad + o_opts.margin < w)
+	{
+		r_fill(
+			e_fromcodepoint(O_MARGINCHAR),
+			(r_attr){o_opts.marginfg, o_opts.marginbg},
+			x + leftpad + o_opts.margin,
+			y + 1,
+			1,
+			h - 1
+		);
+	}
+	
+	// render frame contents and find cursor pos.
+	u32 cx = 0, cy = 0;
+	u32 csrx = -1, csry = -1;
+	for (u32 i = f->start; i < f->len; ++i)
+	{
+		if (!cx)
+		{
+			char linum[32];
+			snprintf(linum, sizeof(linum), "%u", startline + cy);
+			
+			u32 pad = o_opts.lgutter + linumlen - strlen(linum);
+			for (u32 j = 0; linum[j]; ++j)
+			{
+				r_putch(e_fromcodepoint(linum[j]), x + pad + j, y + cy + 1);
+			}
+		}
+		
+		if (leftpad + cx >= w)
+		{
+			cx = 0;
+			++cy;
+		}
+		
+		if (cy + 1 >= h)
+		{
+			break;
+		}
+		
+		if (i == f->csr)
+		{
+			csrx = cx;
+			csry = cy;
+		}
+		
+		u32 cw;
+		switch (f->buf[i].codepoint)
+		{
+		case '\n':
+			cx = 0;
+			++cy;
+			continue;
+		case '\t':
+			cw = o_opts.tab - cx % o_opts.tab;
+			break;
+		default:
+			cw = 1;
+			break;
+		}
+		
+		r_put(f->buf[i], (r_attr){o_opts.normfg, o_opts.normbg}, x + leftpad + cx, y + cy + 1);
+		cx += cw;
+	}
+	
+	csrx = csrx == (u32)-1 ? cx : csrx;
+	csry = csry == (u32)-1 ? cy : csry;
+	
+	// render cursor and row / column highlights.
+	r_fillattr((r_attr){o_opts.hlfg, o_opts.hlbg}, x + leftpad, y + csry + 1, w - leftpad, 1);
+	r_putattr((r_attr){o_opts.csrfg, o_opts.csrbg}, x + leftpad + csrx, y + csry + 1);
 }
 
 i32
@@ -198,12 +327,18 @@ f_write(f_frame *f, e_char *data, u32 pos, usize n)
 void
 f_erase(f_frame *f, u32 lb, u32 ub)
 {
+	(void)f;
+	(void)lb;
+	(void)ub;
+	
 	// TODO: implement.
 }
 
 void
 f_undo(f_frame *f)
 {
+	(void)f;
+	
 	// TODO: implement.
 }
 
@@ -220,4 +355,56 @@ f_breakhist(f_frame *f)
 	{
 		.type = F_BREAK
 	};
+}
+
+void
+f_savecsr(f_frame *f)
+{
+	u32 lbegin = f->csr;
+	while (lbegin > 0 && f->buf[lbegin - 1].codepoint != '\n')
+	{
+		--lbegin;
+	}
+	
+	u32 cx = 0;
+	for (u32 i = lbegin; i < f->csr; ++i)
+	{
+		switch (f->buf[i].codepoint)
+		{
+		case '\t':
+			cx += o_opts.tab - cx % o_opts.tab;
+			break;
+		default:
+			++cx;
+			break;
+		}
+	}
+	
+	f->svcsrx = cx;
+}
+
+void
+f_loadcsr(f_frame *f)
+{
+	u32 lbegin = f->csr;
+	while (lbegin > 0 && f->buf[lbegin - 1].codepoint != '\n')
+	{
+		--lbegin;
+	}
+	
+	u32 i = lbegin;
+	for (u32 cx = 0; i < f->len && f->buf[i].codepoint != '\n' && cx < f->svcsrx; ++i)
+	{
+		switch (f->buf[i].codepoint)
+		{
+		case '\t':
+			cx += o_opts.tab - cx % o_opts.tab;
+			break;
+		default:
+			++cx;
+			break;
+		}
+	}
+	
+	f->csr = i;
 }
