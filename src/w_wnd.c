@@ -37,9 +37,7 @@ w_loop(void)
 		r_present();
 		
 		e_char k = i_readkey();
-		if (w_state.writeinput
-			&& k.codepoint != E_INVALIDCODEPOINT
-			&& w_iswritable(k))
+		if (w_state.writeinput && w_iswritable(k))
 		{
 			f_frame *f = &w_state.frames[w_state.curframe];
 			f_writech(f, k, f->csr);
@@ -96,5 +94,8 @@ w_render(void)
 static bool
 w_iswritable(e_char ch)
 {
-	return ch.codepoint == '\t' || e_isprint(ch);
+	// input returns replacement unicode character on non-writing key, and it is
+	// rare that a user wants to input a replacement character, so they are all
+	// just considered non-writable.
+	return (ch.codepoint == '\t' || e_isprint(ch)) && ch.codepoint != E_REPLACEMENT;
 }

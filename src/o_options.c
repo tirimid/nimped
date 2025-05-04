@@ -2,14 +2,11 @@
 
 #define O_K(k) \
 	{ \
-		.enc[0] = k, \
+		.enc = {k, 0, 0, 0}, \
 		.codepoint = k \
 	}
 
-#define O_KEND \
-	{ \
-		.codepoint = E_INVALIDCODEPOINT \
-	}
+#define O_KEND O_K(0)
 
 #define O_KCTL(k) O_K(k - 'a' + 1)
 #define O_KFN(n) O_K(27), O_K(79), O_K(79 + n)

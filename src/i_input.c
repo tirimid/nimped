@@ -31,7 +31,7 @@ i_bind(e_char const *bind, void (*fn)(void))
 	}
 	
 	usize len = 0;
-	while (bind[len].codepoint != E_INVALIDCODEPOINT)
+	while (bind[len].codepoint)
 	{
 		++len;
 	}
@@ -123,10 +123,7 @@ found:
 			i_curbindlen = 0;
 		}
 		
-		return (e_char)
-		{
-			.codepoint = E_INVALIDCODEPOINT
-		};
+		return e_fromcodepoint(E_REPLACEMENT);
 	}
 	
 	i_curbindlen = 0;

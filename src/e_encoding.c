@@ -62,8 +62,7 @@ e_fread(FILE *fp)
 		
 		break;
 	default:
-		codepoint = E_INVALIDCODEPOINT;
-		break;
+		return e_fromcodepoint(E_REPLACEMENT);
 	}
 	
 	return (e_char)
@@ -105,7 +104,7 @@ e_fromcodepoint(u32 codepoint)
 	}
 	else
 	{
-		ch.codepoint = E_INVALIDCODEPOINT;
+		ch = e_fromcodepoint(E_REPLACEMENT);
 	}
 	
 	return ch;
@@ -168,9 +167,8 @@ e_frommem(OUT e_char *ch, u8 const *p)
 		codepoint |= p[3] & 0x3f;
 		break;
 	default:
-		nbytes = 0;
-		codepoint = E_INVALIDCODEPOINT;
-		break;
+		*ch = e_fromcodepoint(E_REPLACEMENT);
+		return 0;
 	}
 	
 	*ch = (e_char)

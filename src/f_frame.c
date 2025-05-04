@@ -56,13 +56,6 @@ f_fromfile(OUT f_frame *f, char const *file)
 			return 1;
 		}
 		
-		if (ch.codepoint == E_INVALIDCODEPOINT)
-		{
-			showerr("frame: file contained an unusable character - %s!", file);
-			fclose(fp);
-			return 1;
-		}
-		
 		if (buflen >= bufcap)
 		{
 			bufcap *= 2;
@@ -225,7 +218,7 @@ f_render(f_frame const *f, u32 x, u32 y, u32 w, u32 h, bool active)
 		default:
 			cw = 1;
 			r_put(
-				e_isprint(f->buf[i]) ? f->buf[i] : e_fromcodepoint(E_REPLACECODEPOINT),
+				e_isprint(f->buf[i]) ? f->buf[i] : e_fromcodepoint(E_REPLACEMENT),
 				(r_attr){o_opts.normfg, o_opts.normbg},
 				x + leftpad + cx,
 				y + cy + 1

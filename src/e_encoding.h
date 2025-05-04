@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#define E_INVALIDCODEPOINT 0xffffffff
-#define E_REPLACECODEPOINT 0xfffd
+#define E_REPLACEMENT 0xfffd
 
 typedef struct e_char
 {
