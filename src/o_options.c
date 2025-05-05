@@ -36,6 +36,7 @@ e_char_t o_bundo[] = {O_K('u'), O_KEND};
 e_char_t o_bnewframe[] = {O_KCTL('n'), O_KEND};
 e_char_t o_bkillframe[] = {O_KCTL('k'), O_KEND};
 e_char_t o_bsave[] = {O_KCTL('s'), O_KEND};
+e_char_t o_bfocus[] = {O_K('m'), O_KEND};
 
 o_opts_t o_opts;
 

@@ -63,6 +63,7 @@ extern e_char_t o_bundo[];
 extern e_char_t o_bnewframe[];
 extern e_char_t o_bkillframe[];
 extern e_char_t o_bsave[];
+extern e_char_t o_bfocus[];
 
 // dynamic options.
 typedef struct o_opts

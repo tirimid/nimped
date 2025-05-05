@@ -16,6 +16,7 @@ static void b_undo(void);
 static void b_newframe(void);
 static void b_killframe(void);
 static void b_save(void);
+static void b_focus(void);
 
 void
 b_installbase(void)
@@ -35,6 +36,7 @@ b_installbase(void)
 	i_bind(o_bnewframe, b_newframe);
 	i_bind(o_bkillframe, b_killframe);
 	i_bind(o_bsave, b_save);
+	i_bind(o_bfocus, b_focus);
 	i_organize();
 	
 	w_state.writeinput = false;
@@ -191,4 +193,13 @@ static void
 b_save(void)
 {
 	// TODO: implement.
+}
+
+static void
+b_focus(void)
+{
+	f_frame_t tmp = w_state.frames[w_state.curframe];
+	w_state.frames[w_state.curframe] = w_state.frames[0];
+	w_state.frames[0] = tmp;
+	w_state.curframe = 0;
 }
