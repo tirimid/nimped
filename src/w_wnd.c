@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-w_wndstate w_state;
+w_state_t w_state;
 
-static bool w_iswritable(e_char ch);
+static bool w_iswritable(e_char_t ch);
 
 i32
 w_init(void)
@@ -36,12 +36,13 @@ w_loop(void)
 		w_render();
 		r_present();
 		
-		e_char k = i_readkey();
+		e_char_t k = i_readkey();
 		if (w_state.writeinput && w_iswritable(k))
 		{
-			f_frame *f = &w_state.frames[w_state.curframe];
+			f_frame_t *f = &w_state.frames[w_state.curframe];
 			f_writech(f, k, f->csr);
 			++f->csr;
+			f_savecsr(f);
 		}
 	}
 }
@@ -52,7 +53,7 @@ w_render(void)
 	u32 rw, rh;
 	r_winsize(&rw, &rh);
 	
-	r_clear(e_fromcodepoint(' '), (r_attr){o_opts.globalfg, o_opts.globalbg});
+	r_clear(e_fromcodepoint(' '), (r_attr_t){o_opts.globalfg, o_opts.globalbg});
 	
 	// mono frame.
 	if (w_state.nframes == 1)
@@ -92,7 +93,7 @@ w_render(void)
 }
 
 static bool
-w_iswritable(e_char ch)
+w_iswritable(e_char_t ch)
 {
 	// input returns replacement unicode character on non-writing key, and it is
 	// rare that a user wants to input a replacement character, so they are all

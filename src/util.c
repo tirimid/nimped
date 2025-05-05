@@ -9,7 +9,14 @@ showerr(char const *fmt, ...)
 	char msg[512];
 	vsnprintf(msg, sizeof(msg), fmt, args);
 	
-	fprintf(stderr, "err: %s\n", msg);
+	if (w_state.running)
+	{
+		// TODO: show error message during editor execution.
+	}
+	else
+	{
+		fprintf(stderr, "err: %s\n", msg);
+	}
 	
 	va_end(args);
 }

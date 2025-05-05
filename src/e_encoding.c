@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-e_char
+e_char_t
 e_read(void)
 {
 	return e_fread(stdin);
 }
 
-e_char
+e_char_t
 e_fread(FILE *fp)
 {
 	u8 enc[4] = {0};
@@ -14,7 +14,7 @@ e_fread(FILE *fp)
 	enc[0] = fgetc(fp);
 	if (enc[0] < 0x80)
 	{
-		return (e_char)
+		return (e_char_t)
 		{
 			.codepoint = enc[0],
 			.enc = {enc[0], 0, 0, 0}
@@ -65,17 +65,17 @@ e_fread(FILE *fp)
 		return e_fromcodepoint(E_REPLACEMENT);
 	}
 	
-	return (e_char)
+	return (e_char_t)
 	{
 		.codepoint = codepoint,
 		.enc = {enc[0], enc[1], enc[2], enc[3]}
 	};
 }
 
-e_char
+e_char_t
 e_fromcodepoint(u32 codepoint)
 {
-	e_char ch =
+	e_char_t ch =
 	{
 		.codepoint = codepoint
 	};
@@ -110,11 +110,11 @@ e_fromcodepoint(u32 codepoint)
 	return ch;
 }
 
-e_char *
+e_char_t *
 e_fromstr(OUT usize *len, char const *s)
 {
 	*len = strlen(s);
-	e_char *es = calloc(*len, sizeof(e_char));
+	e_char_t *es = calloc(*len, sizeof(e_char_t));
 	
 	for (usize i = 0; i < *len;)
 	{
@@ -126,11 +126,11 @@ e_fromstr(OUT usize *len, char const *s)
 }
 
 usize
-e_frommem(OUT e_char *ch, u8 const *p)
+e_frommem(OUT e_char_t *ch, u8 const *p)
 {
 	if (p[0] < 0x80)
 	{
-		*ch = (e_char)
+		*ch = (e_char_t)
 		{
 			.codepoint = p[0],
 			.enc = {p[0], 0, 0, 0}
@@ -171,7 +171,7 @@ e_frommem(OUT e_char *ch, u8 const *p)
 		return 0;
 	}
 	
-	*ch = (e_char)
+	*ch = (e_char_t)
 	{
 		.codepoint = codepoint,
 		.enc = {p[0], p[1], p[2], p[3]}
@@ -180,13 +180,13 @@ e_frommem(OUT e_char *ch, u8 const *p)
 }
 
 i32
-e_putch(e_char ch)
+e_putch(e_char_t ch)
 {
 	return e_fputch(ch, stdout);
 }
 
 i32
-e_fputch(e_char ch, FILE *fp)
+e_fputch(e_char_t ch, FILE *fp)
 {
 	for (usize i = 0; i < 4; ++i)
 	{
@@ -205,7 +205,7 @@ e_fputch(e_char ch, FILE *fp)
 }
 
 bool
-e_isprint(e_char ch)
+e_isprint(e_char_t ch)
 {
 	if (ch.codepoint <= 0x1f
 		|| (ch.codepoint >= 0x7f && ch.codepoint <= 0x9f)

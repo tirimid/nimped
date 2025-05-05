@@ -2,8 +2,8 @@
 
 static void r_sigwinch(int arg);
 
-static e_char *r_cellchars;
-static r_attr *r_cellattrs;
+static e_char_t *r_cellchars;
+static r_attr_t *r_cellattrs;
 static u32 r_w, r_h;
 static struct termios r_oldtermios;
 
@@ -35,8 +35,8 @@ r_init(void)
 	r_w = ws.ws_col;
 	r_h = ws.ws_row;
 	
-	r_cellchars = calloc(r_w * r_h, sizeof(e_char));
-	r_cellattrs = calloc(r_w * r_h, sizeof(r_attr));
+	r_cellchars = calloc(r_w * r_h, sizeof(e_char_t));
+	r_cellattrs = calloc(r_w * r_h, sizeof(r_attr_t));
 	
 	struct sigaction sa;
 	sigaction(SIGWINCH, NULL, &sa);
@@ -47,12 +47,14 @@ r_init(void)
 }
 
 void
-r_quit(void)
+r_quit(bool clearscr)
 {
-	free(r_cellchars);
-	free(r_cellattrs);
+	printf("\x1b[?25h\x1b[0m\r");
 	
-	printf("\x1b[?25h\x1b[0m\x1b[2J\x1b[H");
+	if (clearscr)
+	{
+		printf("\x1b[2J\x1b[H");
+	}
 	
 	if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &r_oldtermios))
 	{
@@ -62,7 +64,7 @@ r_quit(void)
 }
 
 void
-r_clear(e_char ch, r_attr a)
+r_clear(e_char_t ch, r_attr_t a)
 {
 	for (usize i = 0; i < r_w * r_h; ++i)
 	{
@@ -72,7 +74,7 @@ r_clear(e_char ch, r_attr a)
 }
 
 void
-r_fillch(e_char ch, u32 x, u32 y, u32 w, u32 h)
+r_fillch(e_char_t ch, u32 x, u32 y, u32 w, u32 h)
 {
 	if (x >= r_w || y >= r_h)
 	{
@@ -92,7 +94,7 @@ r_fillch(e_char ch, u32 x, u32 y, u32 w, u32 h)
 }
 
 void
-r_fillattr(r_attr a, u32 x, u32 y, u32 w, u32 h)
+r_fillattr(r_attr_t a, u32 x, u32 y, u32 w, u32 h)
 {
 	if (x >= r_w || y >= r_h)
 	{
@@ -112,7 +114,7 @@ r_fillattr(r_attr a, u32 x, u32 y, u32 w, u32 h)
 }
 
 void
-r_fill(e_char ch, r_attr a, u32 x, u32 y, u32 w, u32 h)
+r_fill(e_char_t ch, r_attr_t a, u32 x, u32 y, u32 w, u32 h)
 {
 	if (x >= r_w || y >= r_h)
 	{
@@ -133,7 +135,7 @@ r_fill(e_char ch, r_attr a, u32 x, u32 y, u32 w, u32 h)
 }
 
 void
-r_putch(e_char ch, u32 x, u32 y)
+r_putch(e_char_t ch, u32 x, u32 y)
 {
 	if (x >= r_w || y >= r_h)
 	{
@@ -144,7 +146,7 @@ r_putch(e_char ch, u32 x, u32 y)
 }
 
 void
-r_putattr(r_attr a, u32 x, u32 y)
+r_putattr(r_attr_t a, u32 x, u32 y)
 {
 	if (x >= r_w || y >= r_h)
 	{
@@ -155,7 +157,7 @@ r_putattr(r_attr a, u32 x, u32 y)
 }
 
 void
-r_put(e_char ch, r_attr a, u32 x, u32 y)
+r_put(e_char_t ch, r_attr_t a, u32 x, u32 y)
 {
 	if (x >= r_w || y >= r_h)
 	{
@@ -169,7 +171,7 @@ r_put(e_char ch, r_attr a, u32 x, u32 y)
 void
 r_present(void)
 {
-	r_attr a = {0};
+	r_attr_t a = {0};
 	printf("\x1b[38;5;0m\x1b[48;5;0m");
 	
 	for (usize i = 0; i < r_w * r_h; ++i)
@@ -208,8 +210,8 @@ r_sigwinch(int arg)
 	r_w = ws.ws_col;
 	r_h = ws.ws_row;
 	
-	r_cellchars = reallocarray(r_cellchars, r_w * r_h, sizeof(e_char));
-	r_cellattrs = reallocarray(r_cellattrs, r_w * r_h, sizeof(r_attr));
+	r_cellchars = reallocarray(r_cellchars, r_w * r_h, sizeof(e_char_t));
+	r_cellattrs = reallocarray(r_cellattrs, r_w * r_h, sizeof(r_attr_t));
 	
 	printf("\r");
 }

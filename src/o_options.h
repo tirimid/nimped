@@ -46,26 +46,26 @@
 #define O_MARGINCHAR '|'
 
 // keybind options.
-extern e_char o_bmvleft[];
-extern e_char o_bmvright[];
-extern e_char o_bmvup[];
-extern e_char o_bmvdown[];
-extern e_char o_bmvstart[];
-extern e_char o_bmvend[];
-extern e_char o_bquit[];
-extern e_char o_bnext[];
-extern e_char o_bprev[];
-extern e_char o_bwritemode[];
-extern e_char o_bdelfront[];
-extern e_char o_bdelback[];
-extern e_char o_bnewline[];
-extern e_char o_bundo[];
-extern e_char o_bnewframe[];
-extern e_char o_bkillframe[];
-extern e_char o_bsave[];
+extern e_char_t o_bmvleft[];
+extern e_char_t o_bmvright[];
+extern e_char_t o_bmvup[];
+extern e_char_t o_bmvdown[];
+extern e_char_t o_bmvstart[];
+extern e_char_t o_bmvend[];
+extern e_char_t o_bquit[];
+extern e_char_t o_bnext[];
+extern e_char_t o_bprev[];
+extern e_char_t o_bwritemode[];
+extern e_char_t o_bdelfront[];
+extern e_char_t o_bdelback[];
+extern e_char_t o_bnewline[];
+extern e_char_t o_bundo[];
+extern e_char_t o_bnewframe[];
+extern e_char_t o_bkillframe[];
+extern e_char_t o_bsave[];
 
 // dynamic options.
-typedef struct o_options
+typedef struct o_opts
 {
 	u32 masternum, masterdenom;
 	u32 lgutter, rgutter;
@@ -80,8 +80,8 @@ typedef struct o_options
 	u8 csrfg, csrbg;
 	u8 hlfg, hlbg;
 	u8 linumhlfg, linumhlbg;
-} o_options;
+} o_opts_t;
 
-extern o_options o_opts;
+extern o_opts_t o_opts;
 
 i32 o_parse(void);

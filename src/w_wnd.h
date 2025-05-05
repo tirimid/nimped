@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-typedef struct w_wndstate
+typedef struct w_state
 {
-	f_frame frames[O_MAXFILES];
+	f_frame_t frames[O_MAXFILES];
 	usize curframe, nframes;
-	e_char *clipboard;
+	e_char_t *clipboard;
 	u32 clipboardlen;
 	bool running;
 	bool writeinput;
-} w_wndstate;
+} w_state_t;
 
-extern w_wndstate w_state;
+extern w_state_t w_state;
 
 i32 w_init(void);
 void w_loop(void);

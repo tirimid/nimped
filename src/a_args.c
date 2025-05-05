@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-a_argdata a_args;
+a_args_t a_args;
 
 static void a_usage(char const *name);
 

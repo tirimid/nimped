@@ -16,35 +16,35 @@ typedef struct o_namedcolor
 {
 	char const *name;
 	u8 col;
-} o_namedcolor;
+} o_namedcolor_t;
 
 // keybind options.
-e_char o_bmvleft[] = {O_K('h'), O_KEND};
-e_char o_bmvright[] = {O_K('l'), O_KEND};
-e_char o_bmvup[] = {O_K('k'), O_KEND};
-e_char o_bmvdown[] = {O_K('j'), O_KEND};
-e_char o_bmvstart[] = {O_K('a'), O_KEND};
-e_char o_bmvend[] = {O_K('e'), O_KEND};
-e_char o_bquit[] = {O_KCTL('x'), O_KEND};
-e_char o_bnext[] = {O_K('n'), O_KEND};
-e_char o_bprev[] = {O_K('p'), O_KEND};
-e_char o_bwritemode[] = {O_K('i'), O_KEND};
-e_char o_bdelfront[] = {O_KCTL('d'), O_KEND};
-e_char o_bdelback[] = {O_K(127), O_KEND};
-e_char o_bnewline[] = {O_K(13), O_KEND};
-e_char o_bundo[] = {O_K('u'), O_KEND};
-e_char o_bnewframe[] = {O_KCTL('n'), O_KEND};
-e_char o_bkillframe[] = {O_KCTL('k'), O_KEND};
-e_char o_bsave[] = {O_KCTL('s'), O_KEND};
+e_char_t o_bmvleft[] = {O_K('h'), O_KEND};
+e_char_t o_bmvright[] = {O_K('l'), O_KEND};
+e_char_t o_bmvup[] = {O_K('k'), O_KEND};
+e_char_t o_bmvdown[] = {O_K('j'), O_KEND};
+e_char_t o_bmvstart[] = {O_K('a'), O_KEND};
+e_char_t o_bmvend[] = {O_K('e'), O_KEND};
+e_char_t o_bquit[] = {O_KCTL('x'), O_KEND};
+e_char_t o_bnext[] = {O_K('n'), O_KEND};
+e_char_t o_bprev[] = {O_K('p'), O_KEND};
+e_char_t o_bwritemode[] = {O_K('i'), O_KEND};
+e_char_t o_bdelfront[] = {O_KCTL('d'), O_KEND};
+e_char_t o_bdelback[] = {O_K(127), O_KEND};
+e_char_t o_bnewline[] = {O_K(13), O_KEND};
+e_char_t o_bundo[] = {O_K('u'), O_KEND};
+e_char_t o_bnewframe[] = {O_KCTL('n'), O_KEND};
+e_char_t o_bkillframe[] = {O_KCTL('k'), O_KEND};
+e_char_t o_bsave[] = {O_KCTL('s'), O_KEND};
 
-o_options o_opts;
+o_opts_t o_opts;
 
 static FILE *o_openconf(char const *file);
 static i32 o_getraw(char const *name, FILE *fp, char const *key, OUT char val[]);
 static i32 o_getu32(char const *name, FILE *fp, char const *key, OUT u32 *val);
 static i32 o_getcolor(char const *name, FILE *fp, char const *key, OUT u8 *val);
 
-static o_namedcolor o_namedcolors[] =
+static o_namedcolor_t o_namedcolors[] =
 {
 	// these colors will be usable as named palette colors in config.
 	// add the palettes of your favorite themes here.

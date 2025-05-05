@@ -58,14 +58,15 @@ main(int argc, char const *argv[])
 	{
 		return 1;
 	}
-	atexit(r_quit);
 	
 	if (w_init())
 	{
+		r_quit(false);
 		return 1;
 	}
 	
 	w_loop();
 	
+	r_quit(true);
 	return 0;
 }

@@ -56,7 +56,7 @@ b_installwrite(void)
 static void
 b_mvleft(void)
 {
-	f_frame *f = &w_state.frames[w_state.curframe];
+	f_frame_t *f = &w_state.frames[w_state.curframe];
 	if (f->csr > 0)
 	{
 		--f->csr;
@@ -67,7 +67,7 @@ b_mvleft(void)
 static void
 b_mvright(void)
 {
-	f_frame *f = &w_state.frames[w_state.curframe];
+	f_frame_t *f = &w_state.frames[w_state.curframe];
 	if (f->csr < f->len)
 	{
 		++f->csr;
@@ -78,7 +78,7 @@ b_mvright(void)
 static void
 b_mvup(void)
 {
-	f_frame *f = &w_state.frames[w_state.curframe];
+	f_frame_t *f = &w_state.frames[w_state.curframe];
 	f->csr -= f->csr > 0;
 	while (f->csr > 0 && f->buf[f->csr].codepoint != '\n')
 	{
@@ -90,7 +90,7 @@ b_mvup(void)
 static void
 b_mvdown(void)
 {
-	f_frame *f = &w_state.frames[w_state.curframe];
+	f_frame_t *f = &w_state.frames[w_state.curframe];
 	while (f->csr < f->len && f->buf[f->csr].codepoint != '\n')
 	{
 		++f->csr;
@@ -102,7 +102,7 @@ b_mvdown(void)
 static void
 b_mvstart(void)
 {
-	f_frame *f = &w_state.frames[w_state.curframe];
+	f_frame_t *f = &w_state.frames[w_state.curframe];
 	while (f->csr > 0 && f->buf[f->csr - 1].codepoint != '\n')
 	{
 		--f->csr;
@@ -113,7 +113,7 @@ b_mvstart(void)
 static void
 b_mvend(void)
 {
-	f_frame *f = &w_state.frames[w_state.curframe];
+	f_frame_t *f = &w_state.frames[w_state.curframe];
 	while (f->csr < f->len && f->buf[f->csr].codepoint != '\n')
 	{
 		++f->csr;
@@ -155,22 +155,30 @@ static void
 b_newline(void)
 {
 	// TODO: add support for features like unfolding smart parens.
-	f_frame *f = &w_state.frames[w_state.curframe];
+	f_frame_t *f = &w_state.frames[w_state.curframe];
 	f_writech(f, e_fromcodepoint('\n'), f->csr);
 	++f->csr;
+	f_savecsr(f);
 }
 
 static void
 b_undo(void)
 {
-	f_frame *f = &w_state.frames[w_state.curframe];
+	f_frame_t *f = &w_state.frames[w_state.curframe];
 	f_undo(f);
 }
 
 static void
 b_newframe(void)
 {
-	// TODO: implement.
+	if (w_state.nframes >= O_MAXFILES)
+	{
+		showerr("binds: cannot open more than %u frames!", O_MAXFILES);
+		return;
+	}
+	
+	w_state.frames[w_state.nframes++] = f_create();
+	w_state.curframe = w_state.nframes - 1;
 }
 
 static void

@@ -1,35 +1,35 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-f_frame
+f_frame_t
 f_create(void)
 {
-	return (f_frame)
+	return (f_frame_t)
 	{
-		.buf = calloc(1, sizeof(e_char)),
+		.buf = calloc(1, sizeof(e_char_t)),
 		.cap = 1,
-		.hist = calloc(1, sizeof(f_histentry)),
+		.hist = calloc(1, sizeof(f_hist_t)),
 		.histcap = 1
 	};
 }
 
 // assumes that s is non-empty.
-f_frame
+f_frame_t
 f_fromstr(char const *s)
 {
 	usize buflen;
-	e_char *buf = e_fromstr(&buflen, s);
-	return (f_frame)
+	e_char_t *buf = e_fromstr(&buflen, s);
+	return (f_frame_t)
 	{
 		.buf = buf,
 		.len = buflen,
 		.cap = buflen,
-		.hist = calloc(1, sizeof(f_histentry)),
+		.hist = calloc(1, sizeof(f_hist_t)),
 		.histcap = 1
 	};
 }
 
 i32
-f_fromfile(OUT f_frame *f, char const *file)
+f_fromfile(OUT f_frame_t *f, char const *file)
 {
 	FILE *fp = fopen(file, "rb");
 	if (!fp)
@@ -38,12 +38,12 @@ f_fromfile(OUT f_frame *f, char const *file)
 		return 1;
 	}
 	
-	e_char *buf = calloc(1, sizeof(e_char));
+	e_char_t *buf = calloc(1, sizeof(e_char_t));
 	u32 buflen = 0, bufcap = 1;
 	
 	for (;;)
 	{
-		e_char ch = e_fread(fp);
+		e_char_t ch = e_fread(fp);
 		if (feof(fp))
 		{
 			break;
@@ -59,7 +59,7 @@ f_fromfile(OUT f_frame *f, char const *file)
 		if (buflen >= bufcap)
 		{
 			bufcap *= 2;
-			buf = reallocarray(buf, bufcap, sizeof(e_char));
+			buf = reallocarray(buf, bufcap, sizeof(e_char_t));
 		}
 		
 		buf[buflen++] = ch;
@@ -67,19 +67,19 @@ f_fromfile(OUT f_frame *f, char const *file)
 	
 	fclose(fp);
 	
-	*f = (f_frame)
+	*f = (f_frame_t)
 	{
 		.buf = buf,
 		.len = buflen,
 		.cap = bufcap,
-		.hist = calloc(1, sizeof(f_histentry)),
+		.hist = calloc(1, sizeof(f_hist_t)),
 		.histcap = 1
 	};
 	return 0;
 }
 
 void
-f_destroy(f_frame *f)
+f_destroy(f_frame_t *f)
 {
 	free(f->buf);
 	free(f->hist);
@@ -90,14 +90,14 @@ f_destroy(f_frame *f)
 }
 
 void
-f_render(f_frame const *f, u32 x, u32 y, u32 w, u32 h, bool active)
+f_render(f_frame_t const *f, u32 x, u32 y, u32 w, u32 h, bool active)
 {
 	// render window top bar.
-	r_attr atop = active ? (r_attr){o_opts.curwndfg, o_opts.curwndbg} : (r_attr){o_opts.wndfg, o_opts.wndbg};
+	r_attr_t atop = active ? (r_attr_t){o_opts.curwndfg, o_opts.curwndbg} : (r_attr_t){o_opts.wndfg, o_opts.wndbg};
 	r_fill(e_fromcodepoint(' '), atop, x, y, w, 1);
 	
 	usize namelen;
-	e_char *name = e_fromstr(&namelen, f->src ? f->src : O_SCRATCHNAME);
+	e_char_t *name = e_fromstr(&namelen, f->src ? f->src : O_SCRATCHNAME);
 	
 	{
 		u32 i;
@@ -137,7 +137,7 @@ f_render(f_frame const *f, u32 x, u32 y, u32 w, u32 h, bool active)
 	
 	r_fill(
 		e_fromcodepoint(' '),
-		(r_attr){o_opts.linumfg, o_opts.linumbg},
+		(r_attr_t){o_opts.linumfg, o_opts.linumbg},
 		x,
 		y + 1,
 		linumlen + o_opts.lgutter + o_opts.rgutter,
@@ -146,7 +146,7 @@ f_render(f_frame const *f, u32 x, u32 y, u32 w, u32 h, bool active)
 	
 	r_fill(
 		e_fromcodepoint(' '),
-		(r_attr){o_opts.normfg, o_opts.normbg},
+		(r_attr_t){o_opts.normfg, o_opts.normbg},
 		x + linumlen + o_opts.lgutter + o_opts.rgutter,
 		y + 1,
 		w - linumlen + o_opts.lgutter + o_opts.rgutter,
@@ -160,7 +160,7 @@ f_render(f_frame const *f, u32 x, u32 y, u32 w, u32 h, bool active)
 	{
 		r_fill(
 			e_fromcodepoint(O_MARGINCHAR),
-			(r_attr){o_opts.marginfg, o_opts.marginbg},
+			(r_attr_t){o_opts.marginfg, o_opts.marginbg},
 			x + leftpad + o_opts.margin,
 			y + 1,
 			1,
@@ -219,7 +219,7 @@ f_render(f_frame const *f, u32 x, u32 y, u32 w, u32 h, bool active)
 			cw = 1;
 			r_put(
 				e_isprint(f->buf[i]) ? f->buf[i] : e_fromcodepoint(E_REPLACEMENT),
-				(r_attr){o_opts.normfg, o_opts.normbg},
+				(r_attr_t){o_opts.normfg, o_opts.normbg},
 				x + leftpad + cx,
 				y + cy + 1
 			);
@@ -233,13 +233,13 @@ f_render(f_frame const *f, u32 x, u32 y, u32 w, u32 h, bool active)
 	csry = csry == (u32)-1 ? cy : csry;
 	
 	// render cursor and row highlights.
-	r_fillattr((r_attr){o_opts.linumhlfg, o_opts.linumhlbg}, x, y + csry + 1, leftpad, 1);
-	r_fillattr((r_attr){o_opts.hlfg, o_opts.hlbg}, x + leftpad, y + csry + 1, w - leftpad, 1);
-	r_putattr((r_attr){o_opts.csrfg, o_opts.csrbg}, x + leftpad + csrx, y + csry + 1);
+	r_fillattr((r_attr_t){o_opts.linumhlfg, o_opts.linumhlbg}, x, y + csry + 1, leftpad, 1);
+	r_fillattr((r_attr_t){o_opts.hlfg, o_opts.hlbg}, x + leftpad, y + csry + 1, w - leftpad, 1);
+	r_putattr((r_attr_t){o_opts.csrfg, o_opts.csrbg}, x + leftpad + csrx, y + csry + 1);
 }
 
 i32
-f_save(f_frame *f)
+f_save(f_frame_t *f)
 {
 	if (!(f->flags & F_UNSAVED))
 	{
@@ -276,13 +276,13 @@ f_save(f_frame *f)
 }
 
 void
-f_writech(f_frame *f, e_char ch, u32 pos)
+f_writech(f_frame_t *f, e_char_t ch, u32 pos)
 {
 	f_write(f, &ch, pos, 1);
 }
 
 void
-f_write(f_frame *f, e_char *data, u32 pos, usize n)
+f_write(f_frame_t *f, e_char_t const *data, u32 pos, usize n)
 {
 	// modify buffer.
 	u32 newcap = f->cap;
@@ -297,16 +297,16 @@ f_write(f_frame *f, e_char *data, u32 pos, usize n)
 	if (newcap != f->cap)
 	{
 		f->cap = newcap;
-		f->buf = reallocarray(f->buf, f->cap, sizeof(e_char));
+		f->buf = reallocarray(f->buf, f->cap, sizeof(e_char_t));
 	}
 	
-	memmove(&f->buf[pos + n], &f->buf[pos], sizeof(e_char) * (f->len - pos));
-	memcpy(&f->buf[pos], data, sizeof(e_char) * n);
+	memmove(&f->buf[pos + n], &f->buf[pos], sizeof(e_char_t) * (f->len - pos));
+	memcpy(&f->buf[pos], data, sizeof(e_char_t) * n);
 	f->len += n;
 	f->flags |= F_UNSAVED;
 	
 	// push history entry.
-	f_histentry *prev = f->histlen ? &f->hist[f->histlen - 1] : NULL;
+	f_hist_t *prev = f->histlen ? &f->hist[f->histlen - 1] : NULL;
 	if (prev && prev->type == F_WRITE && prev->write.ub == pos)
 	{
 		prev->write.ub = pos + n;
@@ -316,10 +316,10 @@ f_write(f_frame *f, e_char *data, u32 pos, usize n)
 		if (f->histlen >= f->histcap)
 		{
 			f->histcap *= 2;
-			f->hist = reallocarray(f->hist, f->histcap, sizeof(f_histentry));
+			f->hist = reallocarray(f->hist, f->histcap, sizeof(f_hist_t));
 		}
 		
-		f->hist[f->histlen++] = (f_histentry)
+		f->hist[f->histlen++] = (f_hist_t)
 		{
 			.write =
 			{
@@ -332,34 +332,34 @@ f_write(f_frame *f, e_char *data, u32 pos, usize n)
 }
 
 void
-f_erase(f_frame *f, u32 lb, u32 ub)
+f_erase(f_frame_t *f, u32 lb, u32 ub)
 {
 	// TODO: implement.
 }
 
 void
-f_undo(f_frame *f)
+f_undo(f_frame_t *f)
 {
 	// TODO: implement.
 }
 
 void
-f_breakhist(f_frame *f)
+f_breakhist(f_frame_t *f)
 {
 	if (f->len >= f->cap)
 	{
 		f->cap *= 2;
-		f->hist = reallocarray(f->hist, f->cap, sizeof(f_histentry));
+		f->hist = reallocarray(f->hist, f->cap, sizeof(f_hist_t));
 	}
 	
-	f->hist[f->len++] = (f_histentry)
+	f->hist[f->len++] = (f_hist_t)
 	{
 		.type = F_BREAK
 	};
 }
 
 void
-f_savecsr(f_frame *f)
+f_savecsr(f_frame_t *f)
 {
 	u32 lbegin = f->csr;
 	while (lbegin > 0 && f->buf[lbegin - 1].codepoint != '\n')
@@ -385,7 +385,7 @@ f_savecsr(f_frame *f)
 }
 
 void
-f_loadcsr(f_frame *f)
+f_loadcsr(f_frame_t *f)
 {
 	u32 lbegin = f->csr;
 	while (lbegin > 0 && f->buf[lbegin - 1].codepoint != '\n')
@@ -411,7 +411,7 @@ f_loadcsr(f_frame *f)
 }
 
 void
-f_compbounds(f_frame *f, u32 w, u32 h)
+f_compbounds(f_frame_t *f, u32 w, u32 h)
 {
 	if (f->csr < f->start)
 	{
