@@ -46,10 +46,29 @@ static i32 o_getraw(char const *name, FILE *fp, char const *key, OUT char val[])
 static i32 o_getu32(char const *name, FILE *fp, char const *key, OUT u32 *val);
 static i32 o_getcolor(char const *name, FILE *fp, char const *key, OUT u8 *val);
 
+// these colors will be usable as named palette colors in config.
+// add the palettes of your favorite themes here.
 static o_namedcolor_t o_namedcolors[] =
 {
-	// these colors will be usable as named palette colors in config.
-	// add the palettes of your favorite themes here.
+	// terminal.
+	{"@t.darkbg", 0},
+	{"@t.darkred", 1},
+	{"@t.darkgreen", 2},
+	{"@t.darkyellow", 3},
+	{"@t.darkblue", 4},
+	{"@t.darkpurple", 5},
+	{"@t.darkaqua", 6},
+	{"@t.darkfg", 7},
+	{"@t.lightbg", 8},
+	{"@t.lightred", 9},
+	{"@t.lightgreen", 10},
+	{"@t.lightyellow", 11},
+	{"@t.lightblue", 12},
+	{"@t.lightpurple", 13},
+	{"@t.lightaqua", 14},
+	{"@t.lightfg", 15},
+	
+	// gruvbox dark.
 	{"@gbd.bg", 235},
 	{"@gbd.darkred", 124},
 	{"@gbd.darkgreen", 106},
@@ -79,6 +98,8 @@ static o_namedcolor_t o_namedcolors[] =
 	{"@gbd.fg1", 223},
 	{"@gbd.fg0", 229},
 	{"@gbd.lightorange", 208}
+	
+	// TODO: port more theme colors.
 };
 
 i32
