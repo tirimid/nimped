@@ -11,6 +11,7 @@ static void b_next(void);
 static void b_prev(void);
 static void b_delfront(void);
 static void b_delback(void);
+static void b_delword(void);
 static void b_newline(void);
 static void b_undo(void);
 static void b_newframe(void);
@@ -40,6 +41,8 @@ b_installbase(void)
 	i_organize();
 	
 	w_state.writeinput = false;
+	
+	r_setbarstr(O_BASENAME);
 }
 
 void
@@ -49,10 +52,13 @@ b_installwrite(void)
 	i_bind(o_bquit, b_installbase);
 	i_bind(o_bdelfront, b_delfront);
 	i_bind(o_bdelback, b_delback);
+	i_bind(o_bdelword, b_delword);
 	i_bind(o_bnewline, b_newline);
 	i_organize();
 	
 	w_state.writeinput = true;
+	
+	r_setbarstr(O_WRITENAME);
 }
 
 static void
@@ -126,6 +132,7 @@ b_mvend(void)
 static void
 b_quit(void)
 {
+	// TODO: implement checks for unsaved frames.
 	w_state.running = false;
 }
 
@@ -144,11 +151,30 @@ b_prev(void)
 static void
 b_delfront(void)
 {
-	// TODO: implement.
+	f_frame_t *f = &w_state.frames[w_state.curframe];
+	if (f->csr < f->len)
+	{
+		f_erase(f, f->csr, f->csr + 1);
+	}
 }
 
 static void
 b_delback(void)
+{
+	f_frame_t *f = &w_state.frames[w_state.curframe];
+	if (!f->csr)
+	{
+		return;
+	}
+	
+	// TODO: add support for smart paren deletion.
+	--f->csr;
+	f_erase(f, f->csr, f->csr + 1);
+	f_savecsr(f);
+}
+
+static void
+b_delword(void)
 {
 	// TODO: implement.
 }

@@ -27,6 +27,7 @@
 #include "i_input.h"
 #include "r_render.h"
 #include "f_frame.h"
+#include "h_highlight.h"
 #include "w_wnd.h"
 #include "b_binds.h"
 
@@ -35,6 +36,7 @@
 #include "b_binds.c"
 #include "e_encoding.c"
 #include "f_frame.c"
+#include "h_highlight.c"
 #include "i_input.c"
 #include "o_options.c"
 #include "r_render.c"

@@ -53,8 +53,6 @@ w_render(void)
 	u32 rw, rh;
 	r_winsize(&rw, &rh);
 	
-	r_clear(e_fromcodepoint(' '), (r_attr_t){o_opts.globalfg, o_opts.globalbg});
-	
 	// mono frame.
 	if (w_state.nframes == 1)
 	{

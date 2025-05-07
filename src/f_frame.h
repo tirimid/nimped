@@ -23,7 +23,7 @@ typedef union f_hist
 	struct
 	{
 		u8 type;
-		u32 lb;
+		u32 lb, ub;
 		e_char_t *data;
 	} erase;
 	

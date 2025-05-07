@@ -31,6 +31,7 @@ e_char_t o_bprev[] = {O_K('p'), O_KEND};
 e_char_t o_bwritemode[] = {O_K('i'), O_KEND};
 e_char_t o_bdelfront[] = {O_KCTL('d'), O_KEND};
 e_char_t o_bdelback[] = {O_K(127), O_KEND};
+e_char_t o_bdelword[] = {O_KMETA(127), O_KEND};
 e_char_t o_bnewline[] = {O_K(13), O_KEND};
 e_char_t o_bundo[] = {O_K('u'), O_KEND};
 e_char_t o_bnewframe[] = {O_KCTL('n'), O_KEND};

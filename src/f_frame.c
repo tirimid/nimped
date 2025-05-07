@@ -306,10 +306,10 @@ f_write(f_frame_t *f, e_char_t const *data, u32 pos, usize n)
 	f->flags |= F_UNSAVED;
 	
 	// push history entry.
-	f_hist_t *prev = f->histlen ? &f->hist[f->histlen - 1] : NULL;
-	if (prev && prev->type == F_WRITE && prev->write.ub == pos)
+	f_hist_t *h = f->histlen ? &f->hist[f->histlen - 1] : NULL;
+	if (h && h->type == F_WRITE && h->write.ub == pos)
 	{
-		prev->write.ub = pos + n;
+		h->write.ub = pos + n;
 	}
 	else
 	{
@@ -334,7 +334,41 @@ f_write(f_frame_t *f, e_char_t const *data, u32 pos, usize n)
 void
 f_erase(f_frame_t *f, u32 lb, u32 ub)
 {
-	// TODO: implement.
+	// push history entry.
+	f_hist_t *h = f->histlen ? &f->hist[f->histlen - 1] : NULL;
+	if (h && h->type == F_ERASE && h->erase.lb == ub)
+	{
+		h->erase.data = reallocarray(h->erase.data, h->erase.ub - lb, sizeof(e_char_t));
+		memmove(&h->erase.data[ub - lb], h->erase.data, sizeof(e_char_t) * (h->erase.ub - h->erase.lb));
+		memcpy(h->erase.data, &f->buf[lb], sizeof(e_char_t) * (ub - lb));
+		h->erase.lb = lb;
+	}
+	else
+	{
+		if (f->histlen >= f->histcap)
+		{
+			f->histcap *= 2;
+			f->hist = reallocarray(f->hist, f->histcap, sizeof(f_hist_t));
+		}
+		
+		e_char_t *data = calloc(ub - lb, sizeof(e_char_t));
+		memcpy(data, &f->buf[lb], sizeof(e_char_t) * (ub - lb));
+		f->hist[f->histlen++] = (f_hist_t)
+		{
+			.erase =
+			{
+				.type = F_ERASE,
+				.lb = lb,
+				.ub = ub,
+				.data = data
+			}
+		};
+	}
+	
+	// modify buffer.
+	memmove(&f->buf[lb], &f->buf[ub], sizeof(e_char_t) * (f->len - ub));
+	f->len -= ub - lb;
+	f->flags |= F_UNSAVED;
 }
 
 void

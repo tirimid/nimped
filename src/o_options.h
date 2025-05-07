@@ -9,15 +9,14 @@
 // functional options.
 #define O_MAXFILES 8
 #define O_CONFDIR ".config/nimped"
-#define O_LANGDIR "lang"
 #define O_MAINCONF "nimped.conf"
+#define O_MAXBARLEN 512
 
 // input options.
 #define O_MAXBINDLEN 16
 #define O_MAXBINDS 128
 
 // frame options.
-#define O_SCRATCHNAME "-scratch-"
 #define O_GREETERTEXT \
 	"nimped - (n)ew and (imp)roved text (ed)itor\n" \
 	"\n" \
@@ -44,6 +43,9 @@
 
 // visual options.
 #define O_MARGINCHAR '|'
+#define O_SCRATCHNAME "-scratch-"
+#define O_BASENAME "-base-"
+#define O_WRITENAME "-write-"
 
 // keybind options.
 extern e_char_t o_bmvleft[];
@@ -58,6 +60,7 @@ extern e_char_t o_bprev[];
 extern e_char_t o_bwritemode[];
 extern e_char_t o_bdelfront[];
 extern e_char_t o_bdelback[];
+extern e_char_t o_bdelword[];
 extern e_char_t o_bnewline[];
 extern e_char_t o_bundo[];
 extern e_char_t o_bnewframe[];

@@ -6,6 +6,9 @@ static e_char_t *r_cellchars;
 static r_attr_t *r_cellattrs;
 static u32 r_w, r_h;
 static struct termios r_oldtermios;
+static e_char_t r_bar[O_MAXBARLEN];
+static usize r_barlen;
+static u32 r_barh = 1;
 
 i32
 r_init(void)
@@ -60,16 +63,6 @@ r_quit(bool clearscr)
 	{
 		showerr("render: failed on tcsetattr() for old stdin!");
 		return;
-	}
-}
-
-void
-r_clear(e_char_t ch, r_attr_t a)
-{
-	for (usize i = 0; i < r_w * r_h; ++i)
-	{
-		r_cellchars[i] = ch;
-		r_cellattrs[i] = a;
 	}
 }
 
@@ -174,7 +167,7 @@ r_present(void)
 	r_attr_t a = {0};
 	printf("\x1b[38;5;0m\x1b[48;5;0m");
 	
-	for (usize i = 0; i < r_w * r_h; ++i)
+	for (usize i = 0; i < r_w * (r_h - r_barh); ++i)
 	{
 		if (r_cellattrs[i].fg != a.fg || r_cellattrs[i].bg != a.bg)
 		{
@@ -183,6 +176,19 @@ r_present(void)
 		}
 		
 		e_putch(r_cellchars[i]);
+	}
+	
+	printf("\x1b[38;5;%um\x1b[48;5;%um", o_opts.globalfg, o_opts.globalbg);
+	for (usize i = 0; i < r_w * r_barh; ++i)
+	{
+		if (i < r_barlen)
+		{
+			e_putch(r_bar[i]);
+		}
+		else
+		{
+			printf(" ");
+		}
 	}
 }
 
@@ -196,8 +202,34 @@ r_winsize(OUT u32 *w, OUT u32 *h)
 	
 	if (h)
 	{
-		*h = r_h;
+		*h = r_h - r_barh;
 	}
+}
+
+void
+r_setbar(e_char_t const *s, usize n)
+{
+	r_barlen = n > O_MAXBARLEN ? O_MAXBARLEN : n;
+	
+	memcpy(r_bar, s, sizeof(e_char_t) * r_barlen);
+	
+	r_barh = (r_barlen + r_w - 1) / r_w;
+	r_barh += !r_barh;
+}
+
+void
+r_setbarstr(char const *s)
+{
+	usize n = strlen(s);
+	r_barlen = n > O_MAXBARLEN ? O_MAXBARLEN : n;
+	
+	for (usize i = 0; i < r_barlen; ++i)
+	{
+		r_bar[i] = e_fromcodepoint(s[i]);
+	}
+	
+	r_barh = (r_barlen + r_w - 1) / r_w;
+	r_barh += !r_barh;
 }
 
 static void
@@ -214,4 +246,6 @@ r_sigwinch(int arg)
 	r_cellattrs = reallocarray(r_cellattrs, r_w * r_h, sizeof(r_attr_t));
 	
 	printf("\r");
+	
+	r_setbar(r_bar, r_barlen); // recompute bar.
 }
