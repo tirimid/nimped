@@ -6,16 +6,16 @@ showerr(char const *fmt, ...)
 	va_list args;
 	va_start(args, fmt);
 	
-	char msg[512];
-	vsnprintf(msg, sizeof(msg), fmt, args);
+	char msg[512] = "err: ";
+	vsnprintf(&msg[5], sizeof(msg) - 5, fmt, args);
 	
 	if (w_state.running)
 	{
-		// TODO: show error message during editor execution.
+		r_setbarstr(msg);
 	}
 	else
 	{
-		fprintf(stderr, "err: %s\n", msg);
+		fprintf(stderr, "%s\n", msg);
 	}
 	
 	va_end(args);

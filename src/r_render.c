@@ -223,9 +223,10 @@ r_setbarstr(char const *s)
 	usize n = strlen(s);
 	r_barlen = n > O_MAXBARLEN ? O_MAXBARLEN : n;
 	
-	for (usize i = 0; i < r_barlen; ++i)
+	for (usize i = 0; i < r_barlen;)
 	{
-		r_bar[i] = e_fromcodepoint(s[i]);
+		usize nbytes = e_frommem(&r_bar[i], (u8 const *)&s[i]);
+		i += nbytes ? nbytes : 1;
 	}
 	
 	r_barh = (r_barlen + r_w - 1) / r_w;

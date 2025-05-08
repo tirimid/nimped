@@ -193,6 +193,12 @@ static void
 b_undo(void)
 {
 	f_frame_t *f = &w_state.frames[w_state.curframe];
+	if (!f->histlen)
+	{
+		showerr("binds: nothing to undo!");
+		return;
+	}
+	
 	f_undo(f);
 }
 
