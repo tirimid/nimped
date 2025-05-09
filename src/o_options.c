@@ -25,6 +25,8 @@ e_char_t o_bmvup[] = {O_K('k'), O_KEND};
 e_char_t o_bmvdown[] = {O_K('j'), O_KEND};
 e_char_t o_bmvstart[] = {O_K('a'), O_KEND};
 e_char_t o_bmvend[] = {O_K('e'), O_KEND};
+e_char_t o_bmvwordleft[] = {O_K('b'), O_KEND};
+e_char_t o_bmvwordright[] = {O_K('f'), O_KEND};
 e_char_t o_bquit[] = {O_KCTL('x'), O_KEND};
 e_char_t o_bnext[] = {O_K('n'), O_KEND};
 e_char_t o_bprev[] = {O_K('p'), O_KEND};
@@ -100,7 +102,7 @@ static o_namedcolor_t o_namedcolors[] =
 	{"@gbd.fg0", 229},
 	{"@gbd.lightorange", 208}
 	
-	// TODO: port more theme colors.
+	// TODO: port phoenix dark pink colors.
 };
 
 i32
@@ -160,7 +162,8 @@ o_parse(void)
 	
 	// language mode options.
 	char val[O_CONFVALLEN] = {0};
-	for (i32 n = 0; o_nthraw(O_MAINCONF, fp, "ckeyword", val, n); ++n)
+	
+	for (i32 i = 0; o_nthraw(O_MAINCONF, fp, "ckeyword", val, i); ++i)
 	{
 		usize *nkw = &o_opts.lang[O_CMODE].nkeywords;
 		if (*nkw >= O_MAXKEYWORDS)
@@ -173,6 +176,22 @@ o_parse(void)
 		
 		o_opts.lang[O_CMODE].keywords[*nkw] = kw;
 		o_opts.lang[O_CMODE].keywordlen[*nkw] = kwlen;
+		++*nkw;
+	}
+	
+	for (i32 i = 0; o_nthraw(O_MAINCONF, fp, "shkeyword", val, i); ++i)
+	{
+		usize *nkw = &o_opts.lang[O_SHMODE].nkeywords;
+		if (*nkw >= O_MAXKEYWORDS)
+		{
+			break;
+		}
+		
+		usize kwlen;
+		e_char_t *kw = e_fromstr(&kwlen, val);
+		
+		o_opts.lang[O_SHMODE].keywords[*nkw] = kw;
+		o_opts.lang[O_SHMODE].keywordlen[*nkw] = kwlen;
 		++*nkw;
 	}
 	
@@ -346,12 +365,6 @@ o_nthraw(char const *name, FILE *fp, char const *key, OUT char val[], i32 n)
 			return false;
 		}
 		
-		if (n > 0)
-		{
-			--n;
-			continue;
-		}
-		
 		if (!strcmp(val, "NONE"))
 		{
 			val[0] = 0;
@@ -359,6 +372,11 @@ o_nthraw(char const *name, FILE *fp, char const *key, OUT char val[], i32 n)
 		
 		if (!strcmp(buf, key))
 		{
+			if (n > 0)
+			{
+				--n;
+				continue;
+			}
 			return true;
 		}
 	}

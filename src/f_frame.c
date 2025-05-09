@@ -403,7 +403,48 @@ f_erase(f_frame_t *f, u32 lb, u32 ub)
 void
 f_undo(f_frame_t *f)
 {
-	// TODO: implement.
+	while (f->histlen && f->hist[f->histlen - 1].type == F_BREAK)
+	{
+		--f->histlen;
+	}
+	
+	if (!f->histlen)
+	{
+		return;
+	}
+	
+	f_hist_t const *h = &f->hist[f->histlen - 1];
+	switch (h->type)
+	{
+	case F_WRITE:
+		memmove(
+			&f->buf[h->write.lb],
+			&f->buf[h->write.ub],
+			sizeof(e_char_t) * (f->len - h->write.ub)
+		);
+		f->len -= h->write.ub - h->write.lb;
+		f->csr = h->write.lb;
+		f->flags |= F_UNSAVED;
+		break;
+	case F_ERASE:
+		memmove(
+			&f->buf[h->erase.ub],
+			&f->buf[h->erase.lb],
+			sizeof(e_char_t) * (f->len - h->erase.lb)
+		);
+		memcpy(
+			&f->buf[h->erase.lb],
+			h->erase.data,
+			sizeof(e_char_t) * (h->erase.ub - h->erase.lb)
+		);
+		f->len += h->erase.ub - h->erase.lb;
+		f->csr = h->erase.ub;
+		f->flags |= F_UNSAVED;
+		free(h->erase.data);
+		break;
+	}
+	
+	--f->histlen;
 }
 
 void

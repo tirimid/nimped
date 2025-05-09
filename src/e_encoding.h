@@ -17,3 +17,4 @@ i32 e_putch(e_char_t ch);
 i32 e_fputch(e_char_t ch, FILE *fp);
 bool e_isprint(e_char_t ch);
 bool e_isspace(e_char_t ch);
+bool e_isalpha(e_char_t ch);

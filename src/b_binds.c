@@ -6,6 +6,8 @@ static void b_mvup(void);
 static void b_mvdown(void);
 static void b_mvstart(void);
 static void b_mvend(void);
+static void b_mvwordleft(void);
+static void b_mvwordright(void);
 static void b_quit(void);
 static void b_next(void);
 static void b_prev(void);
@@ -29,6 +31,8 @@ b_installbase(void)
 	i_bind(o_bmvdown, b_mvdown);
 	i_bind(o_bmvstart, b_mvstart);
 	i_bind(o_bmvend, b_mvend);
+	i_bind(o_bmvwordleft, b_mvwordleft);
+	i_bind(o_bmvwordright, b_mvwordright);
 	i_bind(o_bquit, b_quit);
 	i_bind(o_bnext, b_next);
 	i_bind(o_bprev, b_prev);
@@ -123,6 +127,36 @@ b_mvend(void)
 {
 	f_frame_t *f = &w_state.frames[w_state.curframe];
 	while (f->csr < f->len && f->buf[f->csr].codepoint != '\n')
+	{
+		++f->csr;
+	}
+	f_savecsr(f);
+}
+
+static void
+b_mvwordleft(void)
+{
+	f_frame_t *f = &w_state.frames[w_state.curframe];
+	while (f->csr && !e_isalpha(f->buf[f->csr - 1]))
+	{
+		--f->csr;
+	}
+	while (f->csr && e_isalpha(f->buf[f->csr - 1]))
+	{
+		--f->csr;
+	}
+	f_savecsr(f);
+}
+
+static void
+b_mvwordright(void)
+{
+	f_frame_t *f = &w_state.frames[w_state.curframe];
+	while (f->csr < f->len && !e_isalpha(f->buf[f->csr]))
+	{
+		++f->csr;
+	}
+	while (f->csr < f->len && e_isalpha(f->buf[f->csr]))
 	{
 		++f->csr;
 	}

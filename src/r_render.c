@@ -165,7 +165,7 @@ void
 r_present(void)
 {
 	r_attr_t a = {0};
-	printf("\x1b[38;5;0m\x1b[48;5;0m");
+	printf("\r\x1b[38;5;0m\x1b[48;5;0m");
 	
 	for (usize i = 0; i < r_w * (r_h - r_barh); ++i)
 	{
@@ -245,8 +245,6 @@ r_sigwinch(int arg)
 	
 	r_cellchars = reallocarray(r_cellchars, r_w * r_h, sizeof(e_char_t));
 	r_cellattrs = reallocarray(r_cellattrs, r_w * r_h, sizeof(r_attr_t));
-	
-	printf("\r");
 	
 	r_setbar(r_bar, r_barlen); // recompute bar.
 }

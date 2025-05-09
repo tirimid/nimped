@@ -38,7 +38,7 @@
 	"\n" \
 	"Additional resources:\n" \
 	"\n" \
-	"* Source code: https://git.tirimid.net/nimped\n" \
+	"\tSource code: https://git.tirimid.net/nimped\n" \
 	"\n" \
 	"(The greeter logo seen above was generated with the use of Figlet)\n"
 
@@ -51,6 +51,7 @@
 typedef enum o_langmode
 {
 	O_CMODE = 0,
+	O_SHMODE,
 	
 	O_LANGMODE_END
 } o_langmode_t;
@@ -62,6 +63,8 @@ extern e_char_t o_bmvup[];
 extern e_char_t o_bmvdown[];
 extern e_char_t o_bmvstart[];
 extern e_char_t o_bmvend[];
+extern e_char_t o_bmvwordleft[];
+extern e_char_t o_bmvwordright[];
 extern e_char_t o_bquit[];
 extern e_char_t o_bnext[];
 extern e_char_t o_bprev[];

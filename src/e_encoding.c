@@ -231,3 +231,10 @@ e_isspace(e_char_t ch)
 	// TODO: implement proper whitespace check.
 	return isspace(ch.codepoint);
 }
+
+bool
+e_isalpha(e_char_t ch)
+{
+	// TODO: implement proper alphabet check.
+	return isalpha(ch.codepoint);
+}

@@ -24,7 +24,7 @@ i_unbind(void)
 i32
 i_bind(e_char_t const *bind, void (*fn)(void))
 {
-	if (i_nbinds >= O_MAXBINDLEN)
+	if (i_nbinds >= O_MAXBINDS)
 	{
 		showerr("input: cannot register more than %u keybinds!", O_MAXBINDLEN);
 		return 1;
