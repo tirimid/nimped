@@ -20,3 +20,4 @@ typedef double f64;
 void showerr(char const *fmt, ...);
 u64 fileid(char const *path, bool deref);
 bool ispathsame(char const *patha, char const *pathb);
+char const *fileext(char const *path);

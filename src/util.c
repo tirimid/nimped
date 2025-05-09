@@ -44,3 +44,10 @@ ispathsame(char const *patha, char const *pathb)
 {
 	return fileid(patha, true) == fileid(pathb, true);
 }
+
+char const *
+fileext(char const *path)
+{
+	char const *s = strrchr(path, '.');
+	return s ? s + 1 : "";
+}

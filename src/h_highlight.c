@@ -1,13 +1,297 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-void
-h_initmodes(void)
-{
-	// TODO: implement.
-}
+#define H_CSPECIAL "!%&()*+,-./:;<=>?[\\]^{|}~"
+#define H_CWORDINIT "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"
+#define H_CWORD "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
+#define H_NUMBERINIT "0123456789"
+#define H_NUMBER "xb-.0123456789aAbBcCdDeEfF"
 
-bool
+static bool h_cmpstr(f_frame_t const *f, char const *cmp, u32 at);
+static bool h_cmpany(f_frame_t const *f, char const *cmp, u32 at);
+static void h_slashcomment(OUT h_region_t *r, f_frame_t const *f, u32 from);
+static void h_number(OUT h_region_t *r, f_frame_t const *f, u32 from);
+static void h_cpreproc(OUT h_region_t *r, f_frame_t const *f, u32 from);
+static void h_cspecial(OUT h_region_t *r, f_frame_t const *f, u32 from);
+static void h_cword(OUT h_region_t *r, f_frame_t const *f, u32 from);
+static void h_cchar(OUT h_region_t *r, f_frame_t const *f, u32 from);
+static void h_cstring(OUT h_region_t *r, f_frame_t const *f, u32 from);
+
+void
 h_find(OUT h_region_t *r, f_frame_t const *f, u32 from)
 {
-	// TODO: implement.
+	if (!f->src)
+	{
+		return;
+	}
+	
+	char const *ext = fileext(f->src);
+	if (!strcmp(ext, "c") || !strcmp(ext, "h"))
+	{
+		h_findc(r, f, from);
+	}
+}
+
+void
+h_findc(OUT h_region_t *r, f_frame_t const *f, u32 from)
+{
+	for (u32 i = from; i < f->len; ++i)
+	{
+		if (h_cmpstr(f, "//", i))
+		{
+			h_slashcomment(r, f, i);
+			return;
+		}
+		else if (h_cmpany(f, H_NUMBERINIT, i))
+		{
+			h_number(r, f, i);
+			return;
+		}
+		else if (h_cmpstr(f, "#", i))
+		{
+			h_cpreproc(r, f, i);
+			return;
+		}
+		else if (h_cmpany(f, H_CSPECIAL, i))
+		{
+			h_cspecial(r, f, i);
+			return;
+		}
+		else if (h_cmpany(f, H_CWORDINIT, i))
+		{
+			h_cword(r, f, i);
+			return;
+		}
+		else if (f->buf[i].codepoint == '\'')
+		{
+			h_cchar(r, f, i);
+			return;
+		}
+		else if (f->buf[i].codepoint == '"')
+		{
+			h_cstring(r, f, i);
+			return;
+		}
+	}
+	
+	*r = (h_region_t)
+	{
+		.lb = f->len,
+		.ub = f->len
+	};
+}
+
+static bool
+h_cmpstr(f_frame_t const *f, char const *cmp, u32 at)
+{
+	for (; *cmp && at < f->len; ++at, ++cmp)
+	{
+		if ((u32)*cmp != f->buf[at].codepoint)
+		{
+			return false;
+		}
+	}
+	return !*cmp;
+}
+
+static bool
+h_cmpany(f_frame_t const *f, char const *cmp, u32 at)
+{
+	for (; *cmp; ++cmp)
+	{
+		if ((u32)*cmp == f->buf[at].codepoint)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+static void
+h_slashcomment(OUT h_region_t *r, f_frame_t const *f, u32 from)
+{
+	u32 end = from;
+	while (end < f->len && f->buf[end].codepoint != '\n')
+	{
+		++end;
+	}
+	
+	*r = (h_region_t)
+	{
+		.lb = from,
+		.ub = end,
+		.fg = o_opts.commentfg,
+		.bg = o_opts.commentbg
+	};
+}
+
+static void
+h_number(OUT h_region_t *r, f_frame_t const *f, u32 from)
+{
+	u32 end = from;
+	while (end < f->len && strchr(H_NUMBER, f->buf[end].codepoint))
+	{
+		++end;
+	}
+	
+	*r = (h_region_t)
+	{
+		.lb = from,
+		.ub = end,
+		.fg = o_opts.numberfg,
+		.bg = o_opts.numberbg
+	};
+}
+
+static void
+h_cpreproc(OUT h_region_t *r, f_frame_t const *f, u32 from)
+{
+	u32 end = from;
+	bool cont = false;
+	while (end < f->len && (cont || f->buf[end].codepoint != '\n'))
+	{
+		if (!e_isspace(f->buf[end]))
+		{
+			cont = f->buf[end].codepoint == '\\';
+		}
+		++end;
+	}
+	
+	*r = (h_region_t)
+	{
+		.lb = from,
+		.ub = end,
+		.fg = o_opts.macrofg,
+		.bg = o_opts.macrobg
+	};
+}
+
+static void
+h_cspecial(OUT h_region_t *r, f_frame_t const *f, u32 from)
+{
+	u32 end = from;
+	while (end < f->len && strchr(H_CSPECIAL, f->buf[end].codepoint))
+	{
+		++end;
+	}
+	
+	*r = (h_region_t)
+	{
+		.lb = from,
+		.ub = end,
+		.fg = o_opts.specialfg,
+		.bg = o_opts.specialbg
+	};
+}
+
+static void
+h_cword(OUT h_region_t *r, f_frame_t const *f, u32 from)
+{
+	i32 nlower = 0;
+	u32 end = from;
+	while (end < f->len && strchr(H_CWORD, f->buf[end].codepoint))
+	{
+		nlower += islower(f->buf[end].codepoint);
+		++end;
+	}
+	
+	*r = (h_region_t)
+	{
+		.lb = from,
+		.ub = end
+	};
+	
+	for (usize i = 0; i < o_opts.lang[O_CMODE].nkeywords; ++i)
+	{
+		u16 kwlen = o_opts.lang[O_CMODE].keywordlen[i];
+		if (end - from != kwlen)
+		{
+			continue;
+		}
+		
+		e_char_t const *kw = o_opts.lang[O_CMODE].keywords[i];
+		if (!memcmp(kw, &f->buf[from], sizeof(e_char_t) * kwlen))
+		{
+			r->fg = o_opts.keywordfg;
+			r->bg = o_opts.keywordbg;
+			return;
+		}
+	}
+	
+	if (end - from >= 2
+		&& f->buf[end - 1].codepoint == 't'
+		&& f->buf[end - 2].codepoint == '_')
+	{
+		r->fg = o_opts.typefg;
+		r->bg = o_opts.typebg;
+		return;
+	}
+	
+	if (!nlower)
+	{
+		r->fg = o_opts.macrofg;
+		r->bg = o_opts.macrobg;
+		return;
+	}
+	
+	u32 next = end;
+	while (next < f->len && e_isspace(f->buf[next]))
+	{
+		++next;
+	}
+	
+	if (next < f->len && f->buf[next].codepoint == '(')
+	{
+		r->fg = o_opts.emphfg;
+		r->bg = o_opts.emphbg;
+		return;
+	}
+	
+	r->fg = o_opts.normfg;
+	r->bg = o_opts.normbg;
+}
+
+static void
+h_cchar(OUT h_region_t *r, f_frame_t const *f, u32 from)
+{
+	u32 end = from + 1;
+	while (end < f->len && f->buf[end].codepoint != '\n')
+	{
+		if (f->buf[end].codepoint == '\'')
+		{
+			++end;
+			break;
+		}
+		end += (f->buf[end].codepoint == '\\') + 1;
+	}
+	
+	*r = (h_region_t)
+	{
+		.lb = from,
+		.ub = end,
+		.fg = o_opts.stringfg,
+		.bg = o_opts.stringbg
+	};
+}
+
+static void
+h_cstring(OUT h_region_t *r, f_frame_t const *f, u32 from)
+{
+	u32 end = from + 1;
+	while (end < f->len && f->buf[end].codepoint != '\n')
+	{
+		if (f->buf[end].codepoint == '"')
+		{
+			++end;
+			break;
+		}
+		end += (f->buf[end].codepoint == '\\') + 1;
+	}
+	
+	*r = (h_region_t)
+	{
+		.lb = from,
+		.ub = end,
+		.fg = o_opts.stringfg,
+		.bg = o_opts.stringbg
+	};
 }

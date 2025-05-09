@@ -72,6 +72,7 @@ f_fromfile(OUT f_frame_t *f, char const *file)
 		.buf = buf,
 		.len = buflen,
 		.cap = bufcap,
+		.src = strdup(file),
 		.hist = calloc(1, sizeof(f_hist_t)),
 		.histcap = 1
 	};
@@ -172,8 +173,21 @@ f_render(f_frame_t const *f, u32 x, u32 y, u32 w, u32 h, bool active)
 	u32 cx = 0, cy = 0;
 	u32 csrx = -1, csry = -1;
 	u32 curline = startline;
+	
+	h_region_t hlreg = {0};
+	h_find(&hlreg, f, 0);
+	while (hlreg.ub < f->start)
+	{
+		h_find(&hlreg, f, hlreg.ub);
+	}
+	
 	for (u32 i = f->start; i < f->len; ++i)
 	{
+		if (i >= hlreg.ub)
+		{
+			h_find(&hlreg, f, hlreg.ub);
+		}
+		
 		if (!cx)
 		{
 			char linum[32];
@@ -217,9 +231,24 @@ f_render(f_frame_t const *f, u32 x, u32 y, u32 w, u32 h, bool active)
 			break;
 		default:
 			cw = 1;
-			r_put(
+			if (i >= hlreg.lb && i < hlreg.ub)
+			{
+				r_putattr(
+					(r_attr_t){hlreg.fg, hlreg.bg},
+					x + leftpad + cx,
+					y + cy + 1
+				);
+			}
+			else
+			{
+				r_putattr(
+					(r_attr_t){o_opts.normfg, o_opts.normbg},
+					x + leftpad + cx,
+					y + cy + 1
+				);
+			}
+			r_putch(
 				e_isprint(f->buf[i]) ? f->buf[i] : e_fromcodepoint(E_REPLACEMENT),
-				(r_attr_t){o_opts.normfg, o_opts.normbg},
 				x + leftpad + cx,
 				y + cy + 1
 			);

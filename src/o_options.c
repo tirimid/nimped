@@ -45,6 +45,7 @@ static FILE *o_openconf(char const *file);
 static i32 o_getraw(char const *name, FILE *fp, char const *key, OUT char val[]);
 static i32 o_getu32(char const *name, FILE *fp, char const *key, OUT u32 *val);
 static i32 o_getcolor(char const *name, FILE *fp, char const *key, OUT u8 *val);
+static bool o_nthraw(char const *name, FILE *fp, char const *key, OUT char val[], i32 n);
 
 // these colors will be usable as named palette colors in config.
 // add the palettes of your favorite themes here.
@@ -111,6 +112,7 @@ o_parse(void)
 		return 1;
 	}
 	
+	// main conf options.
 	if (o_getu32(O_MAINCONF, fp, "masternum", &o_opts.masternum)
 		|| o_getu32(O_MAINCONF, fp, "masterdenom", &o_opts.masterdenom)
 		|| o_getu32(O_MAINCONF, fp, "lgutter", &o_opts.lgutter)
@@ -134,10 +136,44 @@ o_parse(void)
 		|| o_getcolor(O_MAINCONF, fp, "hlfg", &o_opts.hlfg)
 		|| o_getcolor(O_MAINCONF, fp, "hlbg", &o_opts.hlbg)
 		|| o_getcolor(O_MAINCONF, fp, "linumhlfg", &o_opts.linumhlfg)
-		|| o_getcolor(O_MAINCONF, fp, "linumhlbg", &o_opts.linumhlbg))
+		|| o_getcolor(O_MAINCONF, fp, "linumhlbg", &o_opts.linumhlbg)
+		|| o_getcolor(O_MAINCONF, fp, "commentfg", &o_opts.commentfg)
+		|| o_getcolor(O_MAINCONF, fp, "commentbg", &o_opts.commentbg)
+		|| o_getcolor(O_MAINCONF, fp, "macrofg", &o_opts.macrofg)
+		|| o_getcolor(O_MAINCONF, fp, "macrobg", &o_opts.macrobg)
+		|| o_getcolor(O_MAINCONF, fp, "specialfg", &o_opts.specialfg)
+		|| o_getcolor(O_MAINCONF, fp, "specialbg", &o_opts.specialbg)
+		|| o_getcolor(O_MAINCONF, fp, "keywordfg", &o_opts.keywordfg)
+		|| o_getcolor(O_MAINCONF, fp, "keywordbg", &o_opts.keywordbg)
+		|| o_getcolor(O_MAINCONF, fp, "typefg", &o_opts.typefg)
+		|| o_getcolor(O_MAINCONF, fp, "typebg", &o_opts.typebg)
+		|| o_getcolor(O_MAINCONF, fp, "emphfg", &o_opts.emphfg)
+		|| o_getcolor(O_MAINCONF, fp, "emphbg", &o_opts.emphbg)
+		|| o_getcolor(O_MAINCONF, fp, "stringfg", &o_opts.stringfg)
+		|| o_getcolor(O_MAINCONF, fp, "stringbg", &o_opts.stringbg)
+		|| o_getcolor(O_MAINCONF, fp, "numberfg", &o_opts.numberfg)
+		|| o_getcolor(O_MAINCONF, fp, "numberbg", &o_opts.numberbg))
 	{
 		fclose(fp);
 		return 1;
+	}
+	
+	// language mode options.
+	char val[O_CONFVALLEN] = {0};
+	for (i32 n = 0; o_nthraw(O_MAINCONF, fp, "ckeyword", val, n); ++n)
+	{
+		usize *nkw = &o_opts.lang[O_CMODE].nkeywords;
+		if (*nkw >= O_MAXKEYWORDS)
+		{
+			break;
+		}
+		
+		usize kwlen;
+		e_char_t *kw = e_fromstr(&kwlen, val);
+		
+		o_opts.lang[O_CMODE].keywords[*nkw] = kw;
+		o_opts.lang[O_CMODE].keywordlen[*nkw] = kwlen;
+		++*nkw;
 	}
 	
 	fclose(fp);
@@ -276,4 +312,56 @@ o_getcolor(char const *name, FILE *fp, char const *key, OUT u8 *val)
 	
 	*val = ull;
 	return 0;
+}
+
+static bool
+o_nthraw(char const *name, FILE *fp, char const *key, OUT char val[], i32 n)
+{
+	fseek(fp, 0, SEEK_SET);
+	
+	for (usize line = 0; !feof(fp) && !ferror(fp); ++line)
+	{
+		i32 ch;
+		while (ch = fgetc(fp), ch != EOF && isspace(ch))
+		{
+		}
+		
+		if (ch == '#')
+		{
+			while (ch = fgetc(fp), ch != EOF && ch != '\n')
+			{
+			}
+		}
+		
+		if (ch == '\n' || feof(fp))
+		{
+			continue;
+		}
+		
+		fseek(fp, -1, SEEK_CUR);
+		char buf[O_CONFKEYLEN] = {0};
+		if (fscanf(fp, O_CONFSCAN, buf, val) != 2)
+		{
+			showerr("options: error on line %zu of %s!", line, name);
+			return false;
+		}
+		
+		if (n > 0)
+		{
+			--n;
+			continue;
+		}
+		
+		if (!strcmp(val, "NONE"))
+		{
+			val[0] = 0;
+		}
+		
+		if (!strcmp(buf, key))
+		{
+			return true;
+		}
+	}
+	
+	return false;
 }

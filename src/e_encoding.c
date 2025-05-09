@@ -224,3 +224,10 @@ e_isprint(e_char_t ch)
 		return true;
 	}
 }
+
+bool
+e_isspace(e_char_t ch)
+{
+	// TODO: implement proper whitespace check.
+	return isspace(ch.codepoint);
+}

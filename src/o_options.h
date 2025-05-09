@@ -11,6 +11,7 @@
 #define O_CONFDIR ".config/nimped"
 #define O_MAINCONF "nimped.conf"
 #define O_MAXBARLEN 512
+#define O_MAXKEYWORDS 128
 
 // input options.
 #define O_MAXBINDLEN 16
@@ -20,12 +21,12 @@
 #define O_GREETERTEXT \
 	"nimped - (n)ew and (imp)roved text (ed)itor\n" \
 	"\n" \
-	"           _                          _\n" \
-	"     _ __ (_)_ __ ___  _ __   ___  __| |\n" \
-	"    | '_ \\| | '_ ` _ \\| '_ \\ / _ \\/ _` |\n" \
-	"    | | | | | | | | | | |_) |  __/ (_| |\n" \
-	"    |_| |_|_|_| |_| |_| .__/ \\___|\\__,_|\n" \
-	"                      |_|\n" \
+	"\t       _                          _\n" \
+	"\t _ __ (_)_ __ ___  _ __   ___  __| |\n" \
+	"\t| '_ \\| | '_ ` _ \\| '_ \\ / _ \\/ _` |\n" \
+	"\t| | | | | | | | | | |_) |  __/ (_| |\n" \
+	"\t|_| |_|_|_| |_| |_| .__/ \\___|\\__,_|\n" \
+	"\t                  |_|\n" \
 	"\n" \
 	"Welcome to the new and improved text editor by Tirimid - nimped.\n" \
 	"\n" \
@@ -46,6 +47,13 @@
 #define O_SCRATCHNAME "-scratch-"
 #define O_BASENAME "-base-"
 #define O_WRITENAME "-write-"
+
+typedef enum o_langmode
+{
+	O_CMODE = 0,
+	
+	O_LANGMODE_END
+} o_langmode_t;
 
 // keybind options.
 extern e_char_t o_bmvleft[];
@@ -68,13 +76,15 @@ extern e_char_t o_bkillframe[];
 extern e_char_t o_bsave[];
 extern e_char_t o_bfocus[];
 
-// dynamic options.
 typedef struct o_opts
 {
+	// layout options.
 	u32 masternum, masterdenom;
 	u32 lgutter, rgutter;
 	u32 margin;
 	u32 tab;
+	
+	// editor color options.
 	u8 globalfg, globalbg;
 	u8 wndfg, wndbg;
 	u8 curwndfg, curwndbg;
@@ -84,6 +94,24 @@ typedef struct o_opts
 	u8 csrfg, csrbg;
 	u8 hlfg, hlbg;
 	u8 linumhlfg, linumhlbg;
+	
+	// highlight color options.
+	u8 commentfg, commentbg;
+	u8 macrofg, macrobg;
+	u8 specialfg, specialbg;
+	u8 keywordfg, keywordbg;
+	u8 typefg, typebg;
+	u8 emphfg, emphbg;
+	u8 stringfg, stringbg;
+	u8 numberfg, numberbg;
+	
+	// language mode options.
+	struct
+	{
+		usize nkeywords;
+		e_char_t *keywords[O_MAXKEYWORDS];
+		u16 keywordlen[O_MAXKEYWORDS];
+	} lang[O_LANGMODE_END];
 } o_opts_t;
 
 extern o_opts_t o_opts;
