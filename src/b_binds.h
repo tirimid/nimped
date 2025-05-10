@@ -5,3 +5,4 @@ void b_installwrite(void);
 void b_installprompt(void);
 void b_installpathprompt(void);
 void b_installconfirmprompt(void);
+void b_installnumberprompt(void);

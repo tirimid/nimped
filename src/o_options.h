@@ -96,6 +96,7 @@ extern e_char_t o_bcutline[];
 extern e_char_t o_bncopyline[];
 extern e_char_t o_bncutline[];
 extern e_char_t o_bzoom[];
+extern e_char_t o_bgoto[];
 
 typedef struct o_opts
 {

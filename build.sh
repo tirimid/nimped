@@ -4,7 +4,7 @@ INCLUDE="-Isrc"
 DEFINES=""
 WARNINGS="-Wall -Wextra -Wshadow"
 LIBRARIES=""
-CFLAGS="-std=c99 -pedantic -Og -g3 -D_GNU_SOURCE"
+CFLAGS="-std=c99 -pedantic -O3 -D_GNU_SOURCE"
 
 CC=gcc
 CFLAGSFULL="$INCLUDE $DEFINES $WARNINGS $CFLAGS $LIBRARIES"

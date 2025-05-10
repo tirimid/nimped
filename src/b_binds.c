@@ -47,6 +47,7 @@ static void b_cutline(void);
 static void b_ncopyline(void);
 static void b_ncutline(void);
 static void b_zoom(void);
+static void b_goto(void);
 
 void
 b_installbase(void)
@@ -77,6 +78,7 @@ b_installbase(void)
 	i_bind(o_bncopyline, b_ncopyline);
 	i_bind(o_bncutline, b_ncutline);
 	i_bind(o_bzoom, b_zoom);
+	i_bind(o_bgoto, b_goto);
 	i_organize();
 	
 	w_state.writeinput = false;
@@ -159,6 +161,26 @@ b_installconfirmprompt(void)
 	i_unbind();
 	i_bind(o_bquit, b_quitpromptfail);
 	i_bind(o_bnewline, b_quitpromptsuccess);
+	i_organize();
+	
+	w_state.writeinput = false;
+}
+
+void
+b_installnumberprompt(void)
+{
+	i_unbind();
+	i_bind(o_bquit, b_quitpromptfail);
+	i_bind(o_bnewline, b_quitpromptsuccess);
+	i_bind(o_bpmvleft, b_pmvleft);
+	i_bind(o_bpmvright, b_pmvright);
+	i_bind(o_bpmvstart, b_pmvstart);
+	i_bind(o_bpmvend, b_pmvend);
+	i_bind(o_bpmvwordleft, b_pmvwordleft);
+	i_bind(o_bpmvwordright, b_pmvwordright);
+	i_bind(o_bdelfront, b_pdelfront);
+	i_bind(o_bdelback, b_pdelback);
+	i_bind(o_bdelword, b_pdelword);
 	i_organize();
 	
 	w_state.writeinput = false;
@@ -561,9 +583,12 @@ static void
 b_save(void)
 {
 	f_frame_t *f = &w_state.frames[w_state.curframe];
-	if (f->src && f->flags & F_UNSAVED)
+	if (f->src)
 	{
-		f_save(f);
+		if (f->flags & F_UNSAVED)
+		{
+			f_save(f);
+		}
 		return;
 	}
 	
@@ -915,4 +940,55 @@ b_zoom(void)
 			rh / (w_state.nframes - 1) / 2
 		);
 	}
+}
+
+static void
+b_goto(void)
+{
+	b_installnumberprompt();
+	p_beginstr("goto line: ");
+	while (!p_prompt.rc)
+	{
+		w_render();
+		p_render();
+		r_present();
+		
+		e_char_t k = i_readkey();
+		if (isdigit(k.codepoint))
+		{
+			p_writech(k, p_prompt.csr);
+			p_prompt.csr += p_prompt.csr < O_MAXPROMPTLEN;
+		}
+	}
+	p_end();
+	b_installbase();
+	
+	if (p_prompt.rc == P_FAIL)
+	{
+		return;
+	}
+	
+	char *linestr = p_getdatastr();
+	if (!*linestr)
+	{
+		showerr("binds: expected a line number!");
+		free(linestr);
+		return;
+	}
+	
+	u64 line = strtoll(linestr, NULL, 10);
+	free(linestr);
+	line -= line > 0;
+	
+	f_frame_t *f = &w_state.frames[w_state.curframe];
+	
+	f->csr = 0;
+	while (f->csr < f->len && line)
+	{
+		if (f->buf[f->csr++].codepoint == '\n')
+		{
+			--line;
+		}
+	}
+	f_savecsr(f);
 }

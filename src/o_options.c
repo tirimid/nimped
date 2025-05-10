@@ -59,6 +59,7 @@ e_char_t o_bcutline[] = {O_K('d'), O_KEND};
 e_char_t o_bncopyline[] = {O_K('q'), O_K('c'), O_KEND};
 e_char_t o_bncutline[] = {O_K('q'), O_K('d'), O_KEND};
 e_char_t o_bzoom[] = {O_K('z'), O_KEND};
+e_char_t o_bgoto[] = {O_K('g'), O_KEND};
 
 o_opts_t o_opts;
 
