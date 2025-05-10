@@ -49,6 +49,16 @@ e_char_t o_bfocus[] = {O_K('m'), O_KEND};
 e_char_t o_bopenfile[] = {O_KCTL('f'), O_KEND};
 e_char_t o_bcomplete[] = {O_K(9), O_KEND};
 e_char_t o_bsearch[] = {O_K('/'), O_KEND};
+e_char_t o_bleftparen[] = {O_K('('), O_KEND};
+e_char_t o_bleftbracket[] = {O_K('['), O_KEND};
+e_char_t o_bleftbrace[] = {O_K('{'), O_KEND};
+e_char_t o_bdoublequote[] = {O_K('"'), O_KEND};
+e_char_t o_bpaste[] = {O_K('v'), O_KEND};
+e_char_t o_bcopyline[] = {O_K('c'), O_KEND};
+e_char_t o_bcutline[] = {O_K('d'), O_KEND};
+e_char_t o_bncopyline[] = {O_K('q'), O_K('c'), O_KEND};
+e_char_t o_bncutline[] = {O_K('q'), O_K('d'), O_KEND};
+e_char_t o_bzoom[] = {O_K('z'), O_KEND};
 
 o_opts_t o_opts;
 

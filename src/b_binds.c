@@ -33,6 +33,20 @@ static void b_save(void);
 static void b_focus(void);
 static void b_openfile(void);
 static void b_search(void);
+static void b_fleftparen(void);
+static void b_fleftbracket(void);
+static void b_fleftbrace(void);
+static void b_fdoublequote(void);
+static void b_pleftparen(void);
+static void b_pleftbracket(void);
+static void b_pleftbrace(void);
+static void b_pdoublequote(void);
+static void b_paste(void);
+static void b_copyline(void);
+static void b_cutline(void);
+static void b_ncopyline(void);
+static void b_ncutline(void);
+static void b_zoom(void);
 
 void
 b_installbase(void)
@@ -57,6 +71,12 @@ b_installbase(void)
 	i_bind(o_bfocus, b_focus);
 	i_bind(o_bopenfile, b_openfile);
 	i_bind(o_bsearch, b_search);
+	i_bind(o_bpaste, b_paste);
+	i_bind(o_bcopyline, b_copyline);
+	i_bind(o_bcutline, b_cutline);
+	i_bind(o_bncopyline, b_ncopyline);
+	i_bind(o_bncutline, b_ncutline);
+	i_bind(o_bzoom, b_zoom);
 	i_organize();
 	
 	w_state.writeinput = false;
@@ -73,6 +93,10 @@ b_installwrite(void)
 	i_bind(o_bdelback, b_fdelback);
 	i_bind(o_bdelword, b_fdelword);
 	i_bind(o_bnewline, b_newline);
+	i_bind(o_bleftparen, b_fleftparen);
+	i_bind(o_bleftbracket, b_fleftbracket);
+	i_bind(o_bleftbrace, b_fleftbrace);
+	i_bind(o_bdoublequote, b_fdoublequote);
 	i_organize();
 	
 	w_state.writeinput = true;
@@ -95,6 +119,10 @@ b_installprompt(void)
 	i_bind(o_bdelfront, b_pdelfront);
 	i_bind(o_bdelback, b_pdelback);
 	i_bind(o_bdelword, b_pdelword);
+	i_bind(o_bleftparen, b_pleftparen);
+	i_bind(o_bleftbracket, b_pleftbracket);
+	i_bind(o_bleftbrace, b_pleftbrace);
+	i_bind(o_bdoublequote, b_pdoublequote);
 	i_organize();
 	
 	w_state.writeinput = false;
@@ -116,6 +144,10 @@ b_installpathprompt(void)
 	i_bind(o_bdelback, b_pdelback);
 	i_bind(o_bdelword, b_pdelword);
 	i_bind(o_bcomplete, p_pathcomplete);
+	i_bind(o_bleftparen, b_pleftparen);
+	i_bind(o_bleftbracket, b_pleftbracket);
+	i_bind(o_bleftbrace, b_pleftbrace);
+	i_bind(o_bdoublequote, b_pdoublequote);
 	i_organize();
 	
 	w_state.writeinput = false;
@@ -362,7 +394,19 @@ b_fdelback(void)
 		return;
 	}
 	
-	// TODO: add support for smart paren deletion.
+	if (f->csr < f->len)
+	{
+		if ((f->buf[f->csr - 1].codepoint == '(' && f->buf[f->csr].codepoint == ')')
+			|| (f->buf[f->csr - 1].codepoint == '[' && f->buf[f->csr].codepoint == ']')
+			|| (f->buf[f->csr - 1].codepoint == '{' && f->buf[f->csr].codepoint == '}')
+			|| (f->buf[f->csr - 1].codepoint == '"' && f->buf[f->csr].codepoint == '"'))
+		{
+			--f->csr;
+			f_erase(f, f->csr, f->csr + 2);
+			f_savecsr(f);
+			return;
+		}
+	}
 	
 	--f->csr;
 	f_erase(f, f->csr, f->csr + 1);
@@ -407,7 +451,18 @@ b_pdelback(void)
 		return;
 	}
 	
-	// TODO: add support for smart paren deletion.
+	if ((u32)p_prompt.csr < p_prompt.len)
+	{
+		if ((p_prompt.data[p_prompt.csr - 1].codepoint == '(' && p_prompt.data[p_prompt.csr].codepoint == ')')
+			|| (p_prompt.data[p_prompt.csr - 1].codepoint == '[' && p_prompt.data[p_prompt.csr].codepoint == ']')
+			|| (p_prompt.data[p_prompt.csr - 1].codepoint == '{' && p_prompt.data[p_prompt.csr].codepoint == '}')
+			|| (p_prompt.data[p_prompt.csr - 1].codepoint == '"' && p_prompt.data[p_prompt.csr].codepoint == '"'))
+		{
+			--p_prompt.csr;
+			p_erase(p_prompt.csr, p_prompt.csr + 2);
+			return;
+		}
+	}
 	
 	--p_prompt.csr;
 	p_erase(p_prompt.csr, p_prompt.csr + 1);
@@ -437,8 +492,10 @@ b_pdelword(void)
 static void
 b_newline(void)
 {
-	// TODO: add support for features like unfolding smart parens.
 	f_frame_t *f = &w_state.frames[w_state.curframe];
+	
+	// TODO: add support for features like indentation unfolding smart parens.
+	
 	f_writech(f, e_fromcodepoint('\n'), f->csr);
 	++f->csr;
 	f_savecsr(f);
@@ -681,4 +738,165 @@ b_search(void)
 	
 	showerr("binds: didn't find search string!");
 	free(data);
+}
+
+static void
+b_fleftparen(void)
+{
+	f_frame_t *f = &w_state.frames[w_state.curframe];
+	f_writech(f, e_fromcodepoint('('), f->csr);
+	f_writech(f, e_fromcodepoint(')'), f->csr + 1);
+	++f->csr;
+	f_savecsr(f);
+}
+
+static void
+b_fleftbracket(void)
+{
+	f_frame_t *f = &w_state.frames[w_state.curframe];
+	f_writech(f, e_fromcodepoint('['), f->csr);
+	f_writech(f, e_fromcodepoint(']'), f->csr + 1);
+	++f->csr;
+	f_savecsr(f);
+}
+
+static void
+b_fleftbrace(void)
+{
+	f_frame_t *f = &w_state.frames[w_state.curframe];
+	f_writech(f, e_fromcodepoint('{'), f->csr);
+	f_writech(f, e_fromcodepoint('}'), f->csr + 1);
+	++f->csr;
+	f_savecsr(f);
+}
+
+static void
+b_fdoublequote(void)
+{
+	f_frame_t *f = &w_state.frames[w_state.curframe];
+	f_writech(f, e_fromcodepoint('"'), f->csr);
+	f_writech(f, e_fromcodepoint('"'), f->csr + 1);
+	++f->csr;
+	f_savecsr(f);
+}
+
+static void
+b_pleftparen(void)
+{
+	p_writech(e_fromcodepoint('('), p_prompt.csr);
+	p_writech(e_fromcodepoint(')'), p_prompt.csr + 1);
+	++p_prompt.csr;
+}
+
+static void
+b_pleftbracket(void)
+{
+	p_writech(e_fromcodepoint('['), p_prompt.csr);
+	p_writech(e_fromcodepoint(']'), p_prompt.csr + 1);
+	++p_prompt.csr;
+}
+
+static void
+b_pleftbrace(void)
+{
+	p_writech(e_fromcodepoint('{'), p_prompt.csr);
+	p_writech(e_fromcodepoint('}'), p_prompt.csr + 1);
+	++p_prompt.csr;
+}
+
+static void
+b_pdoublequote(void)
+{
+	p_writech(e_fromcodepoint('"'), p_prompt.csr);
+	p_writech(e_fromcodepoint('"'), p_prompt.csr + 1);
+	++p_prompt.csr;
+}
+
+static void
+b_paste(void)
+{
+	if (!w_state.clipboard)
+	{
+		showerr("binds: clipboard is empty!");
+		return;
+	}
+	
+	f_frame_t *f = &w_state.frames[w_state.curframe];
+	
+	f_savecsr(f);
+	while (f->csr < f->len && f->buf[f->csr].codepoint != '\n')
+	{
+		++f->csr;
+	}
+	
+	f_writech(f, e_fromcodepoint('\n'), f->csr);
+	f_write(f, w_state.clipboard, f->csr + 1, w_state.clipboardlen);
+	++f->csr;
+	f_loadcsr(f);
+}
+
+static void
+b_copyline(void)
+{
+	f_frame_t *f = &w_state.frames[w_state.curframe];
+	
+	u32 begin = f->csr;
+	while (begin && f->buf[begin - 1].codepoint != '\n')
+	{
+		--begin;
+	}
+	u32 end = f->csr;
+	while (end < f->len && f->buf[end].codepoint != '\n')
+	{
+		++end;
+	}
+	
+	w_state.clipboardlen = end - begin;
+	w_state.clipboard = reallocarray(w_state.clipboard, end - begin, sizeof(e_char_t));
+	memcpy(w_state.clipboard, &f->buf[begin], sizeof(e_char_t) * (end - begin));
+}
+
+static void
+b_cutline(void)
+{
+	f_frame_t *f = &w_state.frames[w_state.curframe];
+	
+	u32 begin = f->csr;
+	while (begin && f->buf[begin - 1].codepoint != '\n')
+	{
+		--begin;
+	}
+	u32 end = f->csr;
+	while (end < f->len && f->buf[end].codepoint != '\n')
+	{
+		++end;
+	}
+	
+	f_savecsr(f);
+	
+	w_state.clipboardlen = end - begin;
+	w_state.clipboard = reallocarray(w_state.clipboard, end - begin, sizeof(e_char_t));
+	memcpy(w_state.clipboard, &f->buf[begin], sizeof(e_char_t) * (end - begin));
+	f_erase(f, begin, end + (end < f->len));
+	
+	f->csr = begin;
+	f_loadcsr(f);
+}
+
+static void
+b_ncopyline(void)
+{
+	// TODO: implement.
+}
+
+static void
+b_ncutline(void)
+{
+	// TODO: implement.
+}
+
+static void
+b_zoom(void)
+{
+	// TODO: implement.
 }

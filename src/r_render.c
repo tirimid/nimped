@@ -184,7 +184,7 @@ void
 r_present(void)
 {
 	// allow cursor to be drawn on newline if width is exceeded.
-	u32 barh = r_barh + (p_prompt.csr >= 0 && p_prompt.csr % r_w == 0);
+	u32 barh = r_barh + ((u32)p_prompt.csr >= p_prompt.len && p_prompt.csr % r_w == 0);
 	
 	r_attr_t a = {0};
 	printf("\r\x1b[38;5;0m\x1b[48;5;0m");
@@ -234,7 +234,7 @@ r_winsize(OUT u32 *w, OUT u32 *h)
 	
 	if (h)
 	{
-		*h = r_h - r_barh - (p_prompt.csr >= 0 && p_prompt.csr % r_w == 0);
+		*h = r_h - r_barh - ((u32)p_prompt.csr >= p_prompt.len && p_prompt.csr % r_w == 0);
 	}
 }
 
