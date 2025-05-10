@@ -41,6 +41,14 @@ h_find(OUT h_region_t *r, f_frame_t const *f, u32 from)
 	{
 		h_findsh(r, f, from);
 	}
+	else
+	{
+		*r = (h_region_t)
+		{
+			.lb = f->len,
+			.ub = f->len
+		};
+	}
 }
 
 void

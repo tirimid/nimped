@@ -898,5 +898,21 @@ b_ncutline(void)
 static void
 b_zoom(void)
 {
-	// TODO: implement.
+	u32 rw, rh;
+	r_winsize(&rw, &rh);
+	
+	if (!w_state.curframe)
+	{
+		w_state.frames[0].start = 0;
+		f_compbounds(&w_state.frames[0], o_opts.masternum * rw / o_opts.masterdenom, rh / 2);
+	}
+	else
+	{
+		w_state.frames[w_state.curframe].start = 0;
+		f_compbounds(
+			&w_state.frames[w_state.curframe],
+			rw - o_opts.masternum * rw / o_opts.masterdenom,
+			rh / (w_state.nframes - 1) / 2
+		);
+	}
 }
