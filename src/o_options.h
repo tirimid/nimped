@@ -12,8 +12,7 @@
 #define O_MAINCONF "nimped.conf"
 #define O_MAXBARLEN 512
 #define O_MAXKEYWORDS 128
-
-// input options.
+#define O_MAXPROMPTLEN 512
 #define O_MAXBINDLEN 16
 #define O_MAXBINDS 128
 
@@ -57,14 +56,20 @@ typedef enum o_langmode
 } o_langmode_t;
 
 // keybind options.
-extern e_char_t o_bmvleft[];
-extern e_char_t o_bmvright[];
-extern e_char_t o_bmvup[];
-extern e_char_t o_bmvdown[];
-extern e_char_t o_bmvstart[];
-extern e_char_t o_bmvend[];
-extern e_char_t o_bmvwordleft[];
-extern e_char_t o_bmvwordright[];
+extern e_char_t o_bfmvleft[];
+extern e_char_t o_bfmvright[];
+extern e_char_t o_bfmvup[];
+extern e_char_t o_bfmvdown[];
+extern e_char_t o_bfmvstart[];
+extern e_char_t o_bfmvend[];
+extern e_char_t o_bfmvwordleft[];
+extern e_char_t o_bfmvwordright[];
+extern e_char_t o_bpmvleft[];
+extern e_char_t o_bpmvright[];
+extern e_char_t o_bpmvstart[];
+extern e_char_t o_bpmvend[];
+extern e_char_t o_bpmvwordleft[];
+extern e_char_t o_bpmvwordright[];
 extern e_char_t o_bquit[];
 extern e_char_t o_bnext[];
 extern e_char_t o_bprev[];
@@ -78,6 +83,8 @@ extern e_char_t o_bnewframe[];
 extern e_char_t o_bkillframe[];
 extern e_char_t o_bsave[];
 extern e_char_t o_bfocus[];
+extern e_char_t o_bopenfile[];
+extern e_char_t o_bcomplete[];
 
 typedef struct o_opts
 {

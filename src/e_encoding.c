@@ -125,6 +125,29 @@ e_fromstr(OUT usize *len, char const *s)
 	return es;
 }
 
+char *
+e_tostr(e_char_t const *data, usize len)
+{
+	// first allocate too much memory, then reallocate to the appropriate amount.
+	char *str = calloc(len + 1, sizeof(e_char_t));
+	usize slen = 0;
+	
+	for (usize i = 0; i < len; ++i)
+	{
+		for (usize j = 0; j < 4; ++j)
+		{
+			if (!data[i].enc[j])
+			{
+				break;
+			}
+			
+			str[slen++] = data[i].enc[j];
+		}
+	}
+	
+	return realloc(str, slen + 1);
+}
+
 usize
 e_frommem(OUT e_char_t *ch, u8 const *p)
 {

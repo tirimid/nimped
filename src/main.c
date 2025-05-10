@@ -30,6 +30,7 @@
 #include "h_highlight.h"
 #include "w_wnd.h"
 #include "b_binds.h"
+#include "p_prompt.h"
 
 // project source.
 #include "a_args.c"
@@ -39,6 +40,7 @@
 #include "h_highlight.c"
 #include "i_input.c"
 #include "o_options.c"
+#include "p_prompt.c"
 #include "r_render.c"
 #include "util.c"
 #include "w_wnd.c"

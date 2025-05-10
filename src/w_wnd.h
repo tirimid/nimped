@@ -15,3 +15,5 @@ extern w_state_t w_state;
 i32 w_init(void);
 void w_loop(void);
 void w_render(void);
+bool w_iswritable(e_char_t ch);
+void w_destroyframe(usize idx);

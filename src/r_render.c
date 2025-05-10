@@ -164,10 +164,13 @@ r_put(e_char_t ch, r_attr_t a, u32 x, u32 y)
 void
 r_present(void)
 {
+	// allow cursor to be drawn on newline if width is exceeded.
+	u32 barh = r_barh + (p_prompt.csr >= 0 && p_prompt.csr % r_w == 0);
+	
 	r_attr_t a = {0};
 	printf("\r\x1b[38;5;0m\x1b[48;5;0m");
 	
-	for (usize i = 0; i < r_w * (r_h - r_barh); ++i)
+	for (usize i = 0; i < r_w * (r_h - barh); ++i)
 	{
 		if (r_cellattrs[i].fg != a.fg || r_cellattrs[i].bg != a.bg)
 		{
@@ -179,8 +182,13 @@ r_present(void)
 	}
 	
 	printf("\x1b[38;5;%um\x1b[48;5;%um", o_opts.globalfg, o_opts.globalbg);
-	for (usize i = 0; i < r_w * r_barh; ++i)
+	for (usize i = 0; i < r_w * barh; ++i)
 	{
+		if ((i64)i == p_prompt.csr)
+		{
+			printf("\x1b[38;5;%um\x1b[48;5;%um", o_opts.csrfg, o_opts.csrbg);
+		}
+		
 		if (i < r_barlen)
 		{
 			e_putch(r_bar[i]);
@@ -188,6 +196,11 @@ r_present(void)
 		else
 		{
 			printf(" ");
+		}
+		
+		if ((i64)i == p_prompt.csr)
+		{
+			printf("\x1b[38;5;%um\x1b[48;5;%um", o_opts.globalfg, o_opts.globalbg);
 		}
 	}
 }
@@ -202,7 +215,7 @@ r_winsize(OUT u32 *w, OUT u32 *h)
 	
 	if (h)
 	{
-		*h = r_h - r_barh;
+		*h = r_h - r_barh - (p_prompt.csr >= 0 && p_prompt.csr % r_w == 0);
 	}
 }
 

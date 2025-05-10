@@ -2,8 +2,6 @@
 
 w_state_t w_state;
 
-static bool w_iswritable(e_char_t ch);
-
 i32
 w_init(void)
 {
@@ -90,11 +88,35 @@ w_render(void)
 	}
 }
 
-static bool
+bool
 w_iswritable(e_char_t ch)
 {
 	// input returns replacement unicode character on non-writing key, and it is
 	// rare that a user wants to input a replacement character, so they are all
 	// just considered non-writable.
 	return (ch.codepoint == '\t' || e_isprint(ch)) && ch.codepoint != E_REPLACEMENT;
+}
+
+void
+w_destroyframe(usize idx)
+{
+	f_destroy(&w_state.frames[idx]);
+	
+	if (w_state.nframes == 1)
+	{
+		w_state.frames[0] = f_create();
+		return;
+	}
+	
+	memmove(
+		&w_state.frames[idx],
+		&w_state.frames[idx + 1],
+		sizeof(f_frame_t) * (w_state.nframes - idx)
+	);
+	--w_state.nframes;
+	
+	if (w_state.curframe && w_state.curframe >= idx)
+	{
+		--w_state.curframe;
+	}
 }

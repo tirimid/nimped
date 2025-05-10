@@ -12,6 +12,7 @@ e_char_t e_read(void);
 e_char_t e_fread(FILE *fp);
 e_char_t e_fromcodepoint(u32 codepoint);
 e_char_t *e_fromstr(OUT usize *len, char const *s);
+char *e_tostr(e_char_t const *data, usize len);
 usize e_frommem(OUT e_char_t *ch, u8 const *p);
 i32 e_putch(e_char_t ch);
 i32 e_fputch(e_char_t ch, FILE *fp);
