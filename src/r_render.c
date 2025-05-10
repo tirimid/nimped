@@ -161,6 +161,25 @@ r_put(e_char_t ch, r_attr_t a, u32 x, u32 y)
 	r_cellattrs[r_w * y + x] = a;
 }
 
+e_char_t
+r_getch(u32 x, u32 y)
+{
+	return r_cellchars[r_w * y + x];
+}
+
+r_attr_t
+r_getattr(u32 x, u32 y)
+{
+	return r_cellattrs[r_w * y + x];
+}
+
+void
+r_get(OUT e_char_t *ch, OUT r_attr_t *a, u32 x, u32 y)
+{
+	*ch = r_cellchars[r_w * y + x];
+	*a = r_cellattrs[r_w * y + x];
+}
+
 void
 r_present(void)
 {

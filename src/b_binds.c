@@ -481,7 +481,55 @@ b_killframe(void)
 static void
 b_save(void)
 {
-	// TODO: implement.
+	f_frame_t *f = &w_state.frames[w_state.curframe];
+	if (f->src && f->flags & F_UNSAVED)
+	{
+		f_save(f);
+		return;
+	}
+	
+	b_installpathprompt();
+	p_beginstr("save as: ");
+	while (!p_prompt.rc)
+	{
+		w_render();
+		p_render();
+		r_present();
+		
+		e_char_t k = i_readkey();
+		if (w_iswritable(k))
+		{
+			p_writech(k, p_prompt.csr);
+			p_prompt.csr += p_prompt.csr < O_MAXPROMPTLEN;
+		}
+	}
+	p_end();
+	b_installbase();
+	
+	if (p_prompt.rc == P_FAIL)
+	{
+		return;
+	}
+	
+	char *path = p_getdatastr();
+	
+	for (usize i = 0; i < w_state.nframes; ++i)
+	{
+		if (!w_state.frames[i].src)
+		{
+			continue;
+		}
+		
+		if (ispathsame(w_state.frames[i].src, path))
+		{
+			showerr("binds: cannot save multiple files under one name!");
+			free(path);
+			return;
+		}
+	}
+	
+	f->src = path;
+	f_save(f);
 }
 
 static void
@@ -526,6 +574,23 @@ b_openfile(void)
 	}
 	
 	char *path = p_getdatastr();
+	
+	for (usize i = 0; i < w_state.nframes; ++i)
+	{
+		if (!w_state.frames[i].src)
+		{
+			continue;
+		}
+		
+		if (ispathsame(w_state.frames[i].src, path))
+		{
+			// redirect user to already open file.
+			w_state.curframe = i;
+			free(path);
+			return;
+		}
+	}
+	
 	f_frame_t new;
 	if (f_fromfile(&new, path))
 	{

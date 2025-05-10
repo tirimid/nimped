@@ -101,8 +101,7 @@ typedef struct o_opts
 	u8 normfg, normbg;
 	u8 linumfg, linumbg;
 	u8 marginfg, marginbg;
-	u8 csrfg, csrbg;
-	u8 hlfg, hlbg;
+	u8 csrfg, csrbg, csrhlbg;
 	u8 linumhlfg, linumhlbg;
 	
 	// highlight color options.

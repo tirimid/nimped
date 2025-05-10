@@ -263,21 +263,21 @@ f_render(f_frame_t const *f, u32 x, u32 y, u32 w, u32 h, bool active)
 	
 	// render cursor and row highlights.
 	r_fillattr((r_attr_t){o_opts.linumhlfg, o_opts.linumhlbg}, x, y + csry + 1, leftpad, 1);
-	r_fillattr((r_attr_t){o_opts.hlfg, o_opts.hlbg}, x + leftpad, y + csry + 1, w - leftpad, 1);
+	for (u32 i = 0; leftpad + i < w; ++i)
+	{
+		r_attr_t a = r_getattr(x + leftpad + i, y + csry + 1);
+		a.bg = a.bg == o_opts.normbg ? o_opts.csrhlbg : a.bg;
+		r_putattr(a, x + leftpad + i, y + csry + 1);
+	}
 	r_putattr((r_attr_t){o_opts.csrfg, o_opts.csrbg}, x + leftpad + csrx, y + csry + 1);
 }
 
 i32
 f_save(f_frame_t *f)
 {
-	if (!(f->flags & F_UNSAVED))
-	{
-		return 0;
-	}
-	
 	if (!f->src)
 	{
-		// TODO: implement file chooser save logic.
+		showerr("frame: cannot save frame with no source!");
 		return 1;
 	}
 	
