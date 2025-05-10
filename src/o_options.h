@@ -85,6 +85,7 @@ extern e_char_t o_bsave[];
 extern e_char_t o_bfocus[];
 extern e_char_t o_bopenfile[];
 extern e_char_t o_bcomplete[];
+extern e_char_t o_bsearch[];
 
 typedef struct o_opts
 {

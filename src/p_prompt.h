@@ -27,3 +27,4 @@ void p_render(void);
 e_char_t *p_getdata(OUT usize *len);
 char *p_getdatastr(void);
 void p_pathcomplete(void);
+bool p_iswritable(e_char_t ch);

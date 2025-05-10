@@ -48,6 +48,7 @@ e_char_t o_bsave[] = {O_KCTL('s'), O_KEND};
 e_char_t o_bfocus[] = {O_K('m'), O_KEND};
 e_char_t o_bopenfile[] = {O_KCTL('f'), O_KEND};
 e_char_t o_bcomplete[] = {O_K(9), O_KEND};
+e_char_t o_bsearch[] = {O_K('/'), O_KEND};
 
 o_opts_t o_opts;
 

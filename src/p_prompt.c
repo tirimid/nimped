@@ -89,3 +89,9 @@ p_pathcomplete(void)
 {
 	// TODO: implement.
 }
+
+bool
+p_iswritable(e_char_t ch)
+{
+	return e_isprint(ch) && ch.codepoint != E_REPLACEMENT;
+}

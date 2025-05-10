@@ -2,5 +2,6 @@
 
 void b_installbase(void);
 void b_installwrite(void);
+void b_installprompt(void);
 void b_installpathprompt(void);
 void b_installconfirmprompt(void);

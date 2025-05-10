@@ -32,6 +32,7 @@ static void b_killframe(void);
 static void b_save(void);
 static void b_focus(void);
 static void b_openfile(void);
+static void b_search(void);
 
 void
 b_installbase(void)
@@ -55,6 +56,7 @@ b_installbase(void)
 	i_bind(o_bsave, b_save);
 	i_bind(o_bfocus, b_focus);
 	i_bind(o_bopenfile, b_openfile);
+	i_bind(o_bsearch, b_search);
 	i_organize();
 	
 	w_state.writeinput = false;
@@ -76,6 +78,26 @@ b_installwrite(void)
 	w_state.writeinput = true;
 	
 	r_setbarstr(O_WRITENAME);
+}
+
+void
+b_installprompt(void)
+{
+	i_unbind();
+	i_bind(o_bquit, b_quitpromptfail);
+	i_bind(o_bnewline, b_quitpromptsuccess);
+	i_bind(o_bpmvleft, b_pmvleft);
+	i_bind(o_bpmvright, b_pmvright);
+	i_bind(o_bpmvstart, b_pmvstart);
+	i_bind(o_bpmvend, b_pmvend);
+	i_bind(o_bpmvwordleft, b_pmvwordleft);
+	i_bind(o_bpmvwordright, b_pmvwordright);
+	i_bind(o_bdelfront, b_pdelfront);
+	i_bind(o_bdelback, b_pdelback);
+	i_bind(o_bdelword, b_pdelword);
+	i_organize();
+	
+	w_state.writeinput = false;
 }
 
 void
@@ -497,7 +519,7 @@ b_save(void)
 		r_present();
 		
 		e_char_t k = i_readkey();
-		if (w_iswritable(k))
+		if (p_iswritable(k))
 		{
 			p_writech(k, p_prompt.csr);
 			p_prompt.csr += p_prompt.csr < O_MAXPROMPTLEN;
@@ -559,7 +581,7 @@ b_openfile(void)
 		r_present();
 		
 		e_char_t k = i_readkey();
-		if (w_iswritable(k))
+		if (p_iswritable(k))
 		{
 			p_writech(k, p_prompt.csr);
 			p_prompt.csr += p_prompt.csr < O_MAXPROMPTLEN;
@@ -602,4 +624,61 @@ b_openfile(void)
 	w_state.frames[w_state.nframes] = new;
 	w_state.curframe = w_state.nframes;
 	++w_state.nframes;
+}
+
+static void
+b_search(void)
+{
+	b_installprompt();
+	p_beginstr("search literally: ");
+	while (!p_prompt.rc)
+	{
+		w_render();
+		p_render();
+		r_present();
+		
+		e_char_t k = i_readkey();
+		if (p_iswritable(k))
+		{
+			p_writech(k, p_prompt.csr);
+			p_prompt.csr += p_prompt.csr < O_MAXPROMPTLEN;
+		}
+	}
+	p_end();
+	b_installbase();
+	
+	if (p_prompt.rc == P_FAIL)
+	{
+		return;
+	}
+	
+	f_frame_t *f = &w_state.frames[w_state.curframe];
+	
+	usize len;
+	e_char_t *data = p_getdata(&len);
+	if (!len)
+	{
+		free(data);
+		return;
+	}
+	
+	for (usize i = f->csr + 1; i + len <= f->len; ++i)
+	{
+		for (usize j = 0; j < len && i + j < f->len; ++j)
+		{
+			if (data[j].codepoint != f->buf[i + j].codepoint)
+			{
+				goto nextchar;
+			}
+		}
+		
+		f->csr = i;
+		f_savecsr(f);
+		free(data);
+		return;
+	nextchar:;
+	}
+	
+	showerr("binds: didn't find search string!");
+	free(data);
 }
