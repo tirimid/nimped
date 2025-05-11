@@ -9,7 +9,9 @@
 // functional options.
 #define O_MAXFILES 8
 #define O_CONFDIR ".config/nimped"
-#define O_MAINCONF "nimped.conf"
+#define O_LAYOUTCONF "layout.conf"
+#define O_COLORCONF "color.conf"
+#define O_LANGCONF "lang.conf"
 #define O_MAXBARLEN 512
 #define O_MAXKEYWORDS 128
 #define O_MAXPROMPTLEN 512

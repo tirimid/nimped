@@ -17,6 +17,8 @@ should be a more minimal and sensical editor than the previous one.
 
 * To build the program, run `./build.sh`
 * To install the built binary to your system, run `./install-bin.sh` as root
+* To choose a theme to install, set `THEME` in `install-conf.sh` to a filename
+  in the `themes/` directory
 * To install the configuration files, run `./install-conf.sh`
 * To uninstall the binary from your system, run `./uninstall-bin.sh` as root
 * To uninstall the configuration files, run `./uninstall-conf.sh`

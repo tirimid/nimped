@@ -954,7 +954,7 @@ b_goto(void)
 		r_present();
 		
 		e_char_t k = i_readkey();
-		if (isdigit(k.codepoint))
+		if (k.codepoint < 128 && isdigit(k.codepoint))
 		{
 			p_writech(k, p_prompt.csr);
 			p_prompt.csr += p_prompt.csr < O_MAXPROMPTLEN;
@@ -969,13 +969,6 @@ b_goto(void)
 	}
 	
 	char *linestr = p_getdatastr();
-	if (!*linestr)
-	{
-		showerr("binds: expected a line number!");
-		free(linestr);
-		return;
-	}
-	
 	u64 line = strtoll(linestr, NULL, 10);
 	free(linestr);
 	line -= line > 0;

@@ -120,7 +120,25 @@ static o_namedcolor_t o_namedcolors[] =
 	{"@gbd.fg2", 250},
 	{"@gbd.fg1", 223},
 	{"@gbd.fg0", 229},
-	{"@gbd.lightorange", 208}
+	{"@gbd.lightorange", 208},
+	
+	// github dark.
+	{"@ghd.base0", 233},
+	{"@ghd.base1", 235},
+	{"@ghd.base2", 237},
+	{"@ghd.base3", 243},
+	{"@ghd.base4", 249},
+	{"@ghd.base5", 252},
+	{"@ghd.lightred", 210},
+	{"@ghd.darkred", 203},
+	{"@ghd.darkyellow", 178},
+	{"@ghd.lightyellow", 221},
+	{"@ghd.lightblue", 153},
+	{"@ghd.darkblue", 75},
+	{"@ghd.lightpurple", 183},
+	{"@ghd.darkpurple", 135},
+	{"@ghd.lightgreen", 114},
+	{"@ghd.darkgreen", 76}
 	
 	// TODO: port phoenix dark pink colors.
 };
@@ -128,61 +146,81 @@ static o_namedcolor_t o_namedcolors[] =
 i32
 o_parse(void)
 {
-	FILE *fp = o_openconf(O_MAINCONF);
+	FILE *fp = o_openconf(O_LAYOUTCONF);
 	if (!fp)
 	{
 		return 1;
 	}
 	
-	// main conf options.
-	if (o_getu32(O_MAINCONF, fp, "masternum", &o_opts.masternum)
-		|| o_getu32(O_MAINCONF, fp, "masterdenom", &o_opts.masterdenom)
-		|| o_getu32(O_MAINCONF, fp, "lgutter", &o_opts.lgutter)
-		|| o_getu32(O_MAINCONF, fp, "rgutter", &o_opts.rgutter)
-		|| o_getu32(O_MAINCONF, fp, "margin", &o_opts.margin)
-		|| o_getu32(O_MAINCONF, fp, "tab", &o_opts.tab)
-		|| o_getcolor(O_MAINCONF, fp, "globalfg", &o_opts.globalfg)
-		|| o_getcolor(O_MAINCONF, fp, "globalbg", &o_opts.globalbg)
-		|| o_getcolor(O_MAINCONF, fp, "wndfg", &o_opts.wndfg)
-		|| o_getcolor(O_MAINCONF, fp, "wndbg", &o_opts.wndbg)
-		|| o_getcolor(O_MAINCONF, fp, "curwndfg", &o_opts.curwndfg)
-		|| o_getcolor(O_MAINCONF, fp, "curwndbg", &o_opts.curwndbg)
-		|| o_getcolor(O_MAINCONF, fp, "normfg", &o_opts.normfg)
-		|| o_getcolor(O_MAINCONF, fp, "normbg", &o_opts.normbg)
-		|| o_getcolor(O_MAINCONF, fp, "linumfg", &o_opts.linumfg)
-		|| o_getcolor(O_MAINCONF, fp, "linumbg", &o_opts.linumbg)
-		|| o_getcolor(O_MAINCONF, fp, "marginfg", &o_opts.marginfg)
-		|| o_getcolor(O_MAINCONF, fp, "marginbg", &o_opts.marginbg)
-		|| o_getcolor(O_MAINCONF, fp, "csrfg", &o_opts.csrfg)
-		|| o_getcolor(O_MAINCONF, fp, "csrbg", &o_opts.csrbg)
-		|| o_getcolor(O_MAINCONF, fp, "csrhlbg", &o_opts.csrhlbg)
-		|| o_getcolor(O_MAINCONF, fp, "linumhlfg", &o_opts.linumhlfg)
-		|| o_getcolor(O_MAINCONF, fp, "linumhlbg", &o_opts.linumhlbg)
-		|| o_getcolor(O_MAINCONF, fp, "commentfg", &o_opts.commentfg)
-		|| o_getcolor(O_MAINCONF, fp, "commentbg", &o_opts.commentbg)
-		|| o_getcolor(O_MAINCONF, fp, "macrofg", &o_opts.macrofg)
-		|| o_getcolor(O_MAINCONF, fp, "macrobg", &o_opts.macrobg)
-		|| o_getcolor(O_MAINCONF, fp, "specialfg", &o_opts.specialfg)
-		|| o_getcolor(O_MAINCONF, fp, "specialbg", &o_opts.specialbg)
-		|| o_getcolor(O_MAINCONF, fp, "keywordfg", &o_opts.keywordfg)
-		|| o_getcolor(O_MAINCONF, fp, "keywordbg", &o_opts.keywordbg)
-		|| o_getcolor(O_MAINCONF, fp, "typefg", &o_opts.typefg)
-		|| o_getcolor(O_MAINCONF, fp, "typebg", &o_opts.typebg)
-		|| o_getcolor(O_MAINCONF, fp, "emphfg", &o_opts.emphfg)
-		|| o_getcolor(O_MAINCONF, fp, "emphbg", &o_opts.emphbg)
-		|| o_getcolor(O_MAINCONF, fp, "stringfg", &o_opts.stringfg)
-		|| o_getcolor(O_MAINCONF, fp, "stringbg", &o_opts.stringbg)
-		|| o_getcolor(O_MAINCONF, fp, "numberfg", &o_opts.numberfg)
-		|| o_getcolor(O_MAINCONF, fp, "numberbg", &o_opts.numberbg))
+	// layout conf options.
+	if (o_getu32(O_LAYOUTCONF, fp, "masternum", &o_opts.masternum)
+		|| o_getu32(O_LAYOUTCONF, fp, "masterdenom", &o_opts.masterdenom)
+		|| o_getu32(O_LAYOUTCONF, fp, "lgutter", &o_opts.lgutter)
+		|| o_getu32(O_LAYOUTCONF, fp, "rgutter", &o_opts.rgutter)
+		|| o_getu32(O_LAYOUTCONF, fp, "margin", &o_opts.margin)
+		|| o_getu32(O_LAYOUTCONF, fp, "tab", &o_opts.tab))
 	{
 		fclose(fp);
 		return 1;
 	}
 	
-	// language mode options.
+	fclose(fp);
+	fp = o_openconf(O_COLORCONF);
+	if (!fp)
+	{
+		return 1;
+	}
+	
+	// color conf options.
+	if (o_getcolor(O_COLORCONF, fp, "globalfg", &o_opts.globalfg)
+		|| o_getcolor(O_COLORCONF, fp, "globalbg", &o_opts.globalbg)
+		|| o_getcolor(O_COLORCONF, fp, "wndfg", &o_opts.wndfg)
+		|| o_getcolor(O_COLORCONF, fp, "wndbg", &o_opts.wndbg)
+		|| o_getcolor(O_COLORCONF, fp, "curwndfg", &o_opts.curwndfg)
+		|| o_getcolor(O_COLORCONF, fp, "curwndbg", &o_opts.curwndbg)
+		|| o_getcolor(O_COLORCONF, fp, "normfg", &o_opts.normfg)
+		|| o_getcolor(O_COLORCONF, fp, "normbg", &o_opts.normbg)
+		|| o_getcolor(O_COLORCONF, fp, "linumfg", &o_opts.linumfg)
+		|| o_getcolor(O_COLORCONF, fp, "linumbg", &o_opts.linumbg)
+		|| o_getcolor(O_COLORCONF, fp, "marginfg", &o_opts.marginfg)
+		|| o_getcolor(O_COLORCONF, fp, "marginbg", &o_opts.marginbg)
+		|| o_getcolor(O_COLORCONF, fp, "csrfg", &o_opts.csrfg)
+		|| o_getcolor(O_COLORCONF, fp, "csrbg", &o_opts.csrbg)
+		|| o_getcolor(O_COLORCONF, fp, "csrhlbg", &o_opts.csrhlbg)
+		|| o_getcolor(O_COLORCONF, fp, "linumhlfg", &o_opts.linumhlfg)
+		|| o_getcolor(O_COLORCONF, fp, "linumhlbg", &o_opts.linumhlbg)
+		|| o_getcolor(O_COLORCONF, fp, "commentfg", &o_opts.commentfg)
+		|| o_getcolor(O_COLORCONF, fp, "commentbg", &o_opts.commentbg)
+		|| o_getcolor(O_COLORCONF, fp, "macrofg", &o_opts.macrofg)
+		|| o_getcolor(O_COLORCONF, fp, "macrobg", &o_opts.macrobg)
+		|| o_getcolor(O_COLORCONF, fp, "specialfg", &o_opts.specialfg)
+		|| o_getcolor(O_COLORCONF, fp, "specialbg", &o_opts.specialbg)
+		|| o_getcolor(O_COLORCONF, fp, "keywordfg", &o_opts.keywordfg)
+		|| o_getcolor(O_COLORCONF, fp, "keywordbg", &o_opts.keywordbg)
+		|| o_getcolor(O_COLORCONF, fp, "typefg", &o_opts.typefg)
+		|| o_getcolor(O_COLORCONF, fp, "typebg", &o_opts.typebg)
+		|| o_getcolor(O_COLORCONF, fp, "emphfg", &o_opts.emphfg)
+		|| o_getcolor(O_COLORCONF, fp, "emphbg", &o_opts.emphbg)
+		|| o_getcolor(O_COLORCONF, fp, "stringfg", &o_opts.stringfg)
+		|| o_getcolor(O_COLORCONF, fp, "stringbg", &o_opts.stringbg)
+		|| o_getcolor(O_COLORCONF, fp, "numberfg", &o_opts.numberfg)
+		|| o_getcolor(O_COLORCONF, fp, "numberbg", &o_opts.numberbg))
+	{
+		fclose(fp);
+		return 1;
+	}
+	
+	fclose(fp);
+	fp = o_openconf(O_LANGCONF);
+	if (!fp)
+	{
+		return 1;
+	}
+	
+	// lang conf options.
 	char val[O_CONFVALLEN] = {0};
 	
-	for (i32 i = 0; o_nthraw(O_MAINCONF, fp, "ckeyword", val, i); ++i)
+	for (i32 i = 0; o_nthraw(O_LANGCONF, fp, "ckeyword", val, i); ++i)
 	{
 		usize *nkw = &o_opts.lang[O_CMODE].nkeywords;
 		if (*nkw >= O_MAXKEYWORDS)
@@ -198,7 +236,7 @@ o_parse(void)
 		++*nkw;
 	}
 	
-	for (i32 i = 0; o_nthraw(O_MAINCONF, fp, "shkeyword", val, i); ++i)
+	for (i32 i = 0; o_nthraw(O_LANGCONF, fp, "shkeyword", val, i); ++i)
 	{
 		usize *nkw = &o_opts.lang[O_SHMODE].nkeywords;
 		if (*nkw >= O_MAXKEYWORDS)

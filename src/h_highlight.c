@@ -16,6 +16,7 @@ static void h_number(OUT h_region_t *r, f_frame_t const *f, u32 from);
 static void h_string(OUT h_region_t *r, f_frame_t const *f, u32 from, bool escape, bool newline);
 static void h_special(OUT h_region_t *r, f_frame_t const *f, u32 from, char const *chars);
 static void h_cpreproc(OUT h_region_t *r, f_frame_t const *f, u32 from);
+static void h_ccomment(OUT h_region_t *r, f_frame_t const *f, u32 from);
 static void h_cword(OUT h_region_t *r, f_frame_t const *f, u32 from);
 static void h_shword(OUT h_region_t *r, f_frame_t const *f, u32 from);
 
@@ -41,6 +42,10 @@ h_find(OUT h_region_t *r, f_frame_t const *f, u32 from)
 	{
 		h_findsh(r, f, from);
 	}
+	else if (!strcmp(ext, "py"))
+	{
+		h_findpy(r, f, from);
+	}
 	else
 	{
 		*r = (h_region_t)
@@ -59,6 +64,11 @@ h_findc(OUT h_region_t *r, f_frame_t const *f, u32 from)
 		if (h_cmpstr(f, "//", i))
 		{
 			h_linecomment(r, f, i);
+			return;
+		}
+		else if (h_cmpstr(f, "/*", i))
+		{
+			h_ccomment(r, f, i);
 			return;
 		}
 		else if (h_cmpany(f, H_NUMBERINIT, i))
@@ -137,6 +147,12 @@ h_findsh(OUT h_region_t *r, f_frame_t const *f, u32 from)
 		.lb = f->len,
 		.ub = f->len
 	};
+}
+
+void
+h_findpy(OUT h_region_t *r, f_frame_t const *f, u32 from)
+{
+	// TODO: implement.
 }
 
 static bool
@@ -276,6 +292,25 @@ h_cpreproc(OUT h_region_t *r, f_frame_t const *f, u32 from)
 		.ub = end,
 		.fg = o_opts.macrofg,
 		.bg = o_opts.macrobg
+	};
+}
+
+static void
+h_ccomment(OUT h_region_t *r, f_frame_t const *f, u32 from)
+{
+	u32 end = from + 2;
+	while (end < f->len && !h_cmpstr(f, "*/", end))
+	{
+		++end;
+	}
+	end += 2 * (end < f->len);
+	
+	*r = (h_region_t)
+	{
+		.lb = from,
+		.ub = end,
+		.fg = o_opts.commentfg,
+		.bg = o_opts.commentbg
 	};
 }
 
