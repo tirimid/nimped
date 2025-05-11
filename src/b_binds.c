@@ -33,6 +33,7 @@ static void b_save(void);
 static void b_focus(void);
 static void b_openfile(void);
 static void b_search(void);
+static void b_revsearch(void);
 static void b_fleftparen(void);
 static void b_fleftbracket(void);
 static void b_fleftbrace(void);
@@ -72,6 +73,7 @@ b_installbase(void)
 	i_bind(o_bfocus, b_focus);
 	i_bind(o_bopenfile, b_openfile);
 	i_bind(o_bsearch, b_search);
+	i_bind(o_brevsearch, b_revsearch);
 	i_bind(o_bpaste, b_paste);
 	i_bind(o_bcopyline, b_copyline);
 	i_bind(o_bcutline, b_cutline);
@@ -516,10 +518,71 @@ b_newline(void)
 {
 	f_frame_t *f = &w_state.frames[w_state.curframe];
 	
-	// TODO: add support for features like indentation unfolding smart parens.
+	u32 lbegin = f->csr;
+	while (lbegin && f->buf[lbegin - 1].codepoint != '\n')
+	{
+		--lbegin;
+	}
+	
+	u32 ntab = 0;
+	while (lbegin + ntab < f->len && f->buf[lbegin + ntab].codepoint == '\t')
+	{
+		++ntab;
+	}
+	
+	// unfold parentheticals.
+	bool unfolded = false;
+	if (f->csr && f->csr < f->len)
+	{
+		u32 prevcp = f->buf[f->csr - 1].codepoint, curcp = f->buf[f->csr].codepoint;
+		
+		if (prevcp == '(' || prevcp == '[' || prevcp == '{')
+		{
+			f_writech(f, e_fromcodepoint('\n'), f->csr);
+			++f->csr;
+			
+			for (u32 i = 0; i < ntab + 1; ++i)
+			{
+				f_writech(f, e_fromcodepoint('\t'), f->csr);
+				++f->csr;
+			}
+			
+			f_savecsr(f);
+			
+			unfolded = true;
+		}
+		
+		if ((prevcp == '(' && curcp == ')')
+			|| (prevcp == '[' && curcp == ']')
+			|| (prevcp == '{' && curcp == '}'))
+		{
+			u32 csr = f->csr;
+			f_writech(f, e_fromcodepoint('\n'), csr);
+			++csr;
+			
+			for (u32 i = 0; i < ntab; ++i)
+			{
+				f_writech(f, e_fromcodepoint('\t'), csr);
+				++csr;
+			}
+		}
+	}
+	
+	if (unfolded)
+	{
+		return;
+	}
 	
 	f_writech(f, e_fromcodepoint('\n'), f->csr);
 	++f->csr;
+	
+	while (ntab)
+	{
+		f_writech(f, e_fromcodepoint('\t'), f->csr);
+		++f->csr;
+		--ntab;
+	}
+	
 	f_savecsr(f);
 }
 
@@ -766,6 +829,12 @@ b_search(void)
 }
 
 static void
+b_revsearch(void)
+{
+	// TODO: implement reverse search.
+}
+
+static void
 b_fleftparen(void)
 {
 	f_frame_t *f = &w_state.frames[w_state.curframe];
@@ -911,13 +980,13 @@ b_cutline(void)
 static void
 b_ncopyline(void)
 {
-	// TODO: implement.
+	// TODO: implement n-line copy.
 }
 
 static void
 b_ncutline(void)
 {
-	// TODO: implement.
+	// TODO: implement n-line cut.
 }
 
 static void
@@ -926,10 +995,26 @@ b_zoom(void)
 	u32 rw, rh;
 	r_winsize(&rw, &rh);
 	
+	if (w_state.nframes == 1)
+	{
+		w_state.frames[0].start = 0;
+		f_compbounds(
+			&w_state.frames[0],
+			rw,
+			rh / 2
+		);
+		
+		return;
+	}
+	
 	if (!w_state.curframe)
 	{
 		w_state.frames[0].start = 0;
-		f_compbounds(&w_state.frames[0], o_opts.masternum * rw / o_opts.masterdenom, rh / 2);
+		f_compbounds(
+			&w_state.frames[0],
+			o_opts.masternum * rw / o_opts.masterdenom,
+			rh / 2
+		);
 	}
 	else
 	{

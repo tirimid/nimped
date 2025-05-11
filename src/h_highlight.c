@@ -152,7 +152,7 @@ h_findsh(OUT h_region_t *r, f_frame_t const *f, u32 from)
 void
 h_findpy(OUT h_region_t *r, f_frame_t const *f, u32 from)
 {
-	// TODO: implement.
+	// TODO: implement python highlight.
 }
 
 static bool

@@ -230,15 +230,17 @@ e_fputch(e_char_t ch, FILE *fp)
 bool
 e_isprint(e_char_t ch)
 {
-	if (ch.codepoint <= 0x1f
-		|| (ch.codepoint >= 0x7f && ch.codepoint <= 0x9f)
-		|| (ch.codepoint >= 0x2028 && ch.codepoint <= 0x2029)
-		|| (ch.codepoint >= 0xe0000 && ch.codepoint <= 0xe007f)
-		|| (ch.codepoint >= 0xfff9 && ch.codepoint <= 0xfffb)
-		|| ch.codepoint == 0x61c
-		|| (ch.codepoint >= 0x200e && ch.codepoint <= 0x200f)
-		|| (ch.codepoint >= 0x202a && ch.codepoint <= 0x202e)
-		|| (ch.codepoint >= 0x2066 && ch.codepoint <= 0x2069))
+	u32 cp = ch.codepoint;
+	
+	if (cp <= 0x1f
+		|| (cp >= 0x7f && cp <= 0x9f)
+		|| cp == 0x61c
+		|| (cp >= 0x200e && cp <= 0x200f)
+		|| (cp >= 0x2028 && cp <= 0x2029)
+		|| (cp >= 0x202a && cp <= 0x202e)
+		|| (cp >= 0x2066 && cp <= 0x2069)
+		|| (cp >= 0xfff9 && cp <= 0xfffb)
+		|| (cp >= 0xe0000 && cp <= 0xe007f))
 	{
 		return false;
 	}
@@ -251,13 +253,56 @@ e_isprint(e_char_t ch)
 bool
 e_isspace(e_char_t ch)
 {
-	// TODO: implement proper whitespace check.
-	return isspace(ch.codepoint);
+	u32 cp = ch.codepoint;
+	
+	if ((cp >= 0x9 && cp <= 0xd)
+		|| cp == 0x20
+		|| cp == 0x85
+		|| cp == 0xa0
+		|| cp == 0x1680
+		|| (cp >= 0x2000 && cp <= 0x200a)
+		|| (cp >= 0x2028 && cp <= 0x2029)
+		|| cp == 0x202f
+		|| cp == 0x205f
+		|| cp == 0x3000)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 bool
 e_isalpha(e_char_t ch)
 {
-	// TODO: implement proper alphabet check.
-	return isalpha(ch.codepoint);
+	u32 cp = ch.codepoint;
+	
+	// includes non-assigned codepoints within orthographical ranges.
+	// some writing systems are not included.
+	if ((cp >= 0x41 && cp <= 0x5a)
+		|| (cp >= 0x61 && cp <= 0x7a)
+		|| (cp >= 0xc0 && cp <= 0xd6)
+		|| (cp >= 0xd8 && cp <= 0xf6)
+		|| (cp >= 0xf8 && cp <= 0x2af)
+		|| (cp >= 0x370 && cp <= 0x4ff)
+		|| (cp >= 0x530 && cp <= 0x74f)
+		|| (cp >= 0x780 && cp <= 0x7bf)
+		|| (cp >= 0x900 && cp <= 0xdff)
+		|| (cp >= 0x10a0 && cp <= 0x137f)
+		|| (cp >= 0x1400 && cp <= 0x167f)
+		|| (cp >= 0x1800 && cp <= 0x18af)
+		|| (cp >= 0x1e00 && cp <= 0x1fff)
+		|| (cp >= 0x3040 && cp <= 0x33ff)
+		|| (cp >= 0xfb00 && cp <= 0xfb4f)
+		|| (cp >= 0xfe30 && cp <= 0xfe4f)
+		|| (cp >= 0x10450 && cp <= 0x1047f))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }

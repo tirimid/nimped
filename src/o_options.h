@@ -88,6 +88,7 @@ extern e_char_t o_bfocus[];
 extern e_char_t o_bopenfile[];
 extern e_char_t o_bcomplete[];
 extern e_char_t o_bsearch[];
+extern e_char_t o_brevsearch[];
 extern e_char_t o_bleftparen[];
 extern e_char_t o_bleftbracket[];
 extern e_char_t o_bleftbrace[];

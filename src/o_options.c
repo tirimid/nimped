@@ -49,6 +49,7 @@ e_char_t o_bfocus[] = {O_K('m'), O_KEND};
 e_char_t o_bopenfile[] = {O_KCTL('f'), O_KEND};
 e_char_t o_bcomplete[] = {O_K(9), O_KEND};
 e_char_t o_bsearch[] = {O_K('/'), O_KEND};
+e_char_t o_brevsearch[] = {O_K('?'), O_KEND};
 e_char_t o_bleftparen[] = {O_K('('), O_KEND};
 e_char_t o_bleftbracket[] = {O_K('['), O_KEND};
 e_char_t o_bleftbrace[] = {O_K('{'), O_KEND};
@@ -139,8 +140,6 @@ static o_namedcolor_t o_namedcolors[] =
 	{"@ghd.darkpurple", 135},
 	{"@ghd.lightgreen", 114},
 	{"@ghd.darkgreen", 76}
-	
-	// TODO: port phoenix dark pink colors.
 };
 
 i32

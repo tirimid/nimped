@@ -87,7 +87,7 @@ p_getdatastr(void)
 void
 p_pathcomplete(void)
 {
-	// TODO: implement.
+	// TODO: implement path completion.
 }
 
 bool
