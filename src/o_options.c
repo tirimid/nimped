@@ -69,6 +69,7 @@ static i32 o_getraw(char const *name, FILE *fp, char const *key, OUT char val[])
 static i32 o_getu32(char const *name, FILE *fp, char const *key, OUT u32 *val);
 static i32 o_getcolor(char const *name, FILE *fp, char const *key, OUT u8 *val);
 static bool o_nthraw(char const *name, FILE *fp, char const *key, OUT char val[], i32 n);
+static void o_readlangconf(FILE *fp, char const *kwkey, o_langmode_t mode);
 
 // these colors will be usable as named palette colors in config.
 // add the palettes of your favorite themes here.
@@ -217,39 +218,10 @@ o_parse(void)
 	}
 	
 	// lang conf options.
-	char val[O_CONFVALLEN] = {0};
-	
-	for (i32 i = 0; o_nthraw(O_LANGCONF, fp, "ckeyword", val, i); ++i)
-	{
-		usize *nkw = &o_opts.lang[O_CMODE].nkeywords;
-		if (*nkw >= O_MAXKEYWORDS)
-		{
-			break;
-		}
-		
-		usize kwlen;
-		e_char_t *kw = e_fromstr(&kwlen, val);
-		
-		o_opts.lang[O_CMODE].keywords[*nkw] = kw;
-		o_opts.lang[O_CMODE].keywordlen[*nkw] = kwlen;
-		++*nkw;
-	}
-	
-	for (i32 i = 0; o_nthraw(O_LANGCONF, fp, "shkeyword", val, i); ++i)
-	{
-		usize *nkw = &o_opts.lang[O_SHMODE].nkeywords;
-		if (*nkw >= O_MAXKEYWORDS)
-		{
-			break;
-		}
-		
-		usize kwlen;
-		e_char_t *kw = e_fromstr(&kwlen, val);
-		
-		o_opts.lang[O_SHMODE].keywords[*nkw] = kw;
-		o_opts.lang[O_SHMODE].keywordlen[*nkw] = kwlen;
-		++*nkw;
-	}
+	o_readlangconf(fp, "ckeyword", O_CMODE);
+	o_readlangconf(fp, "shkeyword", O_SHMODE);
+	o_readlangconf(fp, "pykeyword", O_PYMODE);
+	o_readlangconf(fp, "jskeyword", O_JSMODE);
 	
 	fclose(fp);
 	return 0;
@@ -438,4 +410,26 @@ o_nthraw(char const *name, FILE *fp, char const *key, OUT char val[], i32 n)
 	}
 	
 	return false;
+}
+
+static void
+o_readlangconf(FILE *fp, char const *kwkey, o_langmode_t mode)
+{
+	char val[O_CONFVALLEN] = {0};
+	
+	for (i32 i = 0; o_nthraw(O_LANGCONF, fp, kwkey, val, i); ++i)
+	{
+		usize *nkw = &o_opts.lang[mode].nkeywords;
+		if (*nkw >= O_MAXKEYWORDS)
+		{
+			break;
+		}
+		
+		usize kwlen;
+		e_char_t *kw = e_fromstr(&kwlen, val);
+		
+		o_opts.lang[mode].keywords[*nkw] = kw;
+		o_opts.lang[mode].keywordlen[*nkw] = kwlen;
+		++*nkw;
+	}
 }

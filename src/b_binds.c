@@ -260,11 +260,11 @@ static void
 b_fmvwordleft(void)
 {
 	f_frame_t *f = &w_state.frames[w_state.curframe];
-	while (f->csr && !e_isalpha(f->buf[f->csr - 1]))
+	while (f->csr && !e_isalnum(f->buf[f->csr - 1]))
 	{
 		--f->csr;
 	}
-	while (f->csr && e_isalpha(f->buf[f->csr - 1]))
+	while (f->csr && e_isalnum(f->buf[f->csr - 1]))
 	{
 		--f->csr;
 	}
@@ -275,11 +275,11 @@ static void
 b_fmvwordright(void)
 {
 	f_frame_t *f = &w_state.frames[w_state.curframe];
-	while (f->csr < f->len && !e_isalpha(f->buf[f->csr]))
+	while (f->csr < f->len && !e_isalnum(f->buf[f->csr]))
 	{
 		++f->csr;
 	}
-	while (f->csr < f->len && e_isalpha(f->buf[f->csr]))
+	while (f->csr < f->len && e_isalnum(f->buf[f->csr]))
 	{
 		++f->csr;
 	}
@@ -314,12 +314,12 @@ static void
 b_pmvwordleft(void)
 {
 	while ((u32)p_prompt.csr > p_prompt.start
-		&& !e_isalpha(p_prompt.data[p_prompt.csr - 1]))
+		&& !e_isalnum(p_prompt.data[p_prompt.csr - 1]))
 	{
 		--p_prompt.csr;
 	}
 	while ((u32)p_prompt.csr > p_prompt.start
-		&& e_isalpha(p_prompt.data[p_prompt.csr - 1]))
+		&& e_isalnum(p_prompt.data[p_prompt.csr - 1]))
 	{
 		--p_prompt.csr;
 	}
@@ -329,12 +329,12 @@ static void
 b_pmvwordright(void)
 {
 	while ((u32)p_prompt.csr < p_prompt.len
-		&& !e_isalpha(p_prompt.data[p_prompt.csr]))
+		&& !e_isalnum(p_prompt.data[p_prompt.csr]))
 	{
 		++p_prompt.csr;
 	}
 	while ((u32)p_prompt.csr < p_prompt.len
-		&& e_isalpha(p_prompt.data[p_prompt.csr]))
+		&& e_isalnum(p_prompt.data[p_prompt.csr]))
 	{
 		++p_prompt.csr;
 	}
@@ -442,11 +442,11 @@ b_fdelword(void)
 {
 	f_frame_t *f = &w_state.frames[w_state.curframe];
 	u32 ub = f->csr;
-	while (f->csr && !e_isalpha(f->buf[f->csr - 1]))
+	while (f->csr && !e_isalnum(f->buf[f->csr - 1]))
 	{
 		--f->csr;
 	}
-	while (f->csr && e_isalpha(f->buf[f->csr - 1]))
+	while (f->csr && e_isalnum(f->buf[f->csr - 1]))
 	{
 		--f->csr;
 	}
@@ -497,12 +497,12 @@ b_pdelword(void)
 {
 	u32 ub = p_prompt.csr;
 	while ((u32)p_prompt.csr > p_prompt.start
-		&& !e_isalpha(p_prompt.data[p_prompt.csr - 1]))
+		&& !e_isalnum(p_prompt.data[p_prompt.csr - 1]))
 	{
 		--p_prompt.csr;
 	}
 	while ((u32)p_prompt.csr > p_prompt.start
-		&& e_isalpha(p_prompt.data[p_prompt.csr - 1]))
+		&& e_isalnum(p_prompt.data[p_prompt.csr - 1]))
 	{
 		--p_prompt.csr;
 	}
@@ -924,8 +924,8 @@ b_paste(void)
 	}
 	
 	f_writech(f, e_fromcodepoint('\n'), f->csr);
-	f_write(f, w_state.clipboard, f->csr + 1, w_state.clipboardlen);
 	++f->csr;
+	f_write(f, w_state.clipboard, f->csr, w_state.clipboardlen);
 	f_loadcsr(f);
 }
 

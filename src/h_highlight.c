@@ -46,6 +46,10 @@ h_find(OUT h_region_t *r, f_frame_t const *f, u32 from)
 	{
 		h_findpy(r, f, from);
 	}
+	else if (!strcmp(ext, "js"))
+	{
+		h_findjs(r, f, from);
+	}
 	else
 	{
 		*r = (h_region_t)
@@ -153,6 +157,26 @@ void
 h_findpy(OUT h_region_t *r, f_frame_t const *f, u32 from)
 {
 	// TODO: implement python highlight.
+}
+
+void
+h_findjs(OUT h_region_t *r, f_frame_t const *f, u32 from)
+{
+	for (u32 i = from; i < f->len; ++i)
+	{
+		if (h_cmpstr(f, "//", i) || h_cmpstr(f, "#!", i))
+		{
+			h_linecomment(r, f, i);
+			return;
+		}
+		else if (h_cmpstr(f, "/*", i))
+		{
+			h_ccomment(r, f, i);
+			return;
+		}
+		
+		// TODO: finish implementing javascript highlight.
+	}
 }
 
 static bool

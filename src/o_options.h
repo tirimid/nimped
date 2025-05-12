@@ -53,6 +53,8 @@ typedef enum o_langmode
 {
 	O_CMODE = 0,
 	O_SHMODE,
+	O_PYMODE,
+	O_JSMODE,
 	
 	O_LANGMODE_END
 } o_langmode_t;

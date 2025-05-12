@@ -19,3 +19,5 @@ i32 e_fputch(e_char_t ch, FILE *fp);
 bool e_isprint(e_char_t ch);
 bool e_isspace(e_char_t ch);
 bool e_isalpha(e_char_t ch);
+bool e_isdigit(e_char_t ch);
+bool e_isalnum(e_char_t ch);

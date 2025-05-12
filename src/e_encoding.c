@@ -279,7 +279,6 @@ e_isalpha(e_char_t ch)
 {
 	u32 cp = ch.codepoint;
 	
-	// includes non-assigned codepoints within orthographical ranges.
 	// some writing systems are not included.
 	if ((cp >= 0x41 && cp <= 0x5a)
 		|| (cp >= 0x61 && cp <= 0x7a)
@@ -305,4 +304,32 @@ e_isalpha(e_char_t ch)
 	{
 		return false;
 	}
+}
+
+bool
+e_isdigit(e_char_t ch)
+{
+	u32 cp = ch.codepoint;
+	
+	if ((cp >= 0x30 && cp <= 0x39)
+		|| (cp >= 0x2160 && cp <= 0x2188)
+		|| cp == 0x3007
+		|| (cp >= 0x3021 && cp <= 0x3029)
+		|| cp == 0x5341
+		|| (cp >= 0x5344 && cp <= 0x5345)
+		|| (cp >= 0x10140 && cp <= 0x1018f)
+		|| (cp >= 0x1d360 && cp <= 0x1d37f))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool
+e_isalnum(e_char_t ch)
+{
+	return e_isalpha(ch) || e_isdigit(ch);
 }
