@@ -18,6 +18,7 @@ static void h_linecomment(OUT h_region_t *r, f_frame_t const *f, u32 from);
 static void h_number(OUT h_region_t *r, f_frame_t const *f, u32 from);
 static void h_string(OUT h_region_t *r, f_frame_t const *f, u32 from, bool escape, bool newline);
 static void h_special(OUT h_region_t *r, f_frame_t const *f, u32 from, char const *chars);
+static bool h_trykeyword(OUT h_region_t *r, f_frame_t const *f, u32 from, u32 end, o_langmode_t lang);
 static void h_cpreproc(OUT h_region_t *r, f_frame_t const *f, u32 from);
 static void h_ccomment(OUT h_region_t *r, f_frame_t const *f, u32 from);
 static void h_cword(OUT h_region_t *r, f_frame_t const *f, u32 from);
@@ -326,6 +327,35 @@ h_special(OUT h_region_t *r, f_frame_t const *f, u32 from, char const *chars)
 	};
 }
 
+static bool
+h_trykeyword(
+	OUT h_region_t *r,
+	f_frame_t const *f,
+	u32 from,
+	u32 end,
+	o_langmode_t lang
+)
+{
+	for (usize i = 0; i < o_opts.lang[lang].nkeywords; ++i)
+	{
+		u16 kwlen = o_opts.lang[lang].keywordlen[i];
+		if (end - from != kwlen)
+		{
+			continue;
+		}
+		
+		e_char_t const *kw = o_opts.lang[lang].keywords[i];
+		if (!memcmp(kw, &f->buf[from], sizeof(e_char_t) * kwlen))
+		{
+			r->fg = o_opts.keywordfg;
+			r->bg = o_opts.keywordbg;
+			return true;
+		}
+	}
+	
+	return false;
+}
+
 static void
 h_cpreproc(OUT h_region_t *r, f_frame_t const *f, u32 from)
 {
@@ -385,21 +415,9 @@ h_cword(OUT h_region_t *r, f_frame_t const *f, u32 from)
 		.ub = end
 	};
 	
-	for (usize i = 0; i < o_opts.lang[O_CMODE].nkeywords; ++i)
+	if (h_trykeyword(r, f, from, end, O_CMODE))
 	{
-		u16 kwlen = o_opts.lang[O_CMODE].keywordlen[i];
-		if (end - from != kwlen)
-		{
-			continue;
-		}
-		
-		e_char_t const *kw = o_opts.lang[O_CMODE].keywords[i];
-		if (!memcmp(kw, &f->buf[from], sizeof(e_char_t) * kwlen))
-		{
-			r->fg = o_opts.keywordfg;
-			r->bg = o_opts.keywordbg;
-			return;
-		}
+		return;
 	}
 	
 	if (end - from >= 2
@@ -452,21 +470,9 @@ h_shword(OUT h_region_t *r, f_frame_t const *f, u32 from)
 		.ub = end
 	};
 	
-	for (usize i = 0; i < o_opts.lang[O_SHMODE].nkeywords; ++i)
+	if (h_trykeyword(r, f, from, end, O_SHMODE))
 	{
-		u16 kwlen = o_opts.lang[O_SHMODE].keywordlen[i];
-		if (end - from != kwlen)
-		{
-			continue;
-		}
-		
-		e_char_t const *kw = o_opts.lang[O_SHMODE].keywords[i];
-		if (!memcmp(kw, &f->buf[from], sizeof(e_char_t) * kwlen))
-		{
-			r->fg = o_opts.keywordfg;
-			r->bg = o_opts.keywordbg;
-			return;
-		}
+		return;
 	}
 	
 	if (!nlower)
@@ -484,7 +490,7 @@ static void
 h_jsword(OUT h_region_t *r, f_frame_t const *f, u32 from)
 {
 	u32 end = from;
-	while (end < f->len && strchr(H_JSWORD, f->buf[end]))
+	while (end < f->len && strchr(H_JSWORD, f->buf[end].codepoint))
 	{
 		++end;
 	}
@@ -495,9 +501,18 @@ h_jsword(OUT h_region_t *r, f_frame_t const *f, u32 from)
 		.ub = end
 	};
 	
-	for (usize i = 0; i < o_opts.lang[O_JSMODE].nkeywords; ++i)
+	if (h_trykeyword(r, f, from, end, O_JSMODE))
 	{
+		return;
 	}
 	
-	// TODO: finish implementing highlight JS word.
+	if (isupper(f->buf[from].codepoint))
+	{
+		r->fg = o_opts.emphfg;
+		r->bg = o_opts.emphbg;
+		return;
+	}
+	
+	r->fg = o_opts.normfg;
+	r->bg = o_opts.normbg;
 }

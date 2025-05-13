@@ -46,42 +46,49 @@ w_loop(void)
 }
 
 void
-w_render(void)
+w_arrangeframe(usize idx, OUT u32 *x, OUT u32 *y, OUT u32 *w, OUT u32 *h)
 {
 	u32 rw, rh;
 	r_winsize(&rw, &rh);
 	
-	// mono frame.
 	if (w_state.nframes == 1)
 	{
-		f_compbounds(&w_state.frames[0], rw, rh);
-		f_render(&w_state.frames[0], 0, 0, rw, rh, !w_state.curframe);
+		*x = 0;
+		*y = 0;
+		*w = rw;
+		*h = rh;
 		return;
 	}
 	
-	// master frame.
-	f_compbounds(&w_state.frames[0], o_opts.masternum * rw / o_opts.masterdenom, rh);
-	f_render(
-		&w_state.frames[0],
-		0,
-		0,
-		o_opts.masternum * rw / o_opts.masterdenom,
-		rh,
-		!w_state.curframe
-	);
-	
-	// secondary frames.
-	for (usize i = 1; i < w_state.nframes; ++i)
+	if (!idx)
 	{
-		u32 h = rh / (w_state.nframes - 1);
-		u32 y = (i - 1) * h;
-		u32 x = o_opts.masternum * rw / o_opts.masterdenom;
-		u32 w = rw - x;
+		*x = 0;
+		*y = 0;
+		*w = o_opts.masternum * rw / o_opts.masterdenom;
+		*h = rh;
+	}
+	else
+	{
+		*h = rh / (w_state.nframes - 1);
+		*y = (idx - 1) * *h;
+		*x = o_opts.masternum * rw / o_opts.masterdenom;
+		*w = rw - *x;
 		
-		if (y + h > rh || i == w_state.nframes - 1)
+		if (*y + *h > rh || idx == w_state.nframes - 1)
 		{
-			h = rh - y;
+			*h = rh - *y;
 		}
+	}
+}
+
+void
+w_render(void)
+{
+	for (usize i = 0; i < w_state.nframes; ++i)
+	{
+		u32 x, y;
+		u32 w, h;
+		w_arrangeframe(i, &x, &y, &w, &h);
 		
 		f_compbounds(&w_state.frames[i], w, h);
 		f_render(&w_state.frames[i], x, y, w, h, i == w_state.curframe);

@@ -74,6 +74,8 @@ extern e_char_t o_bpmvstart[];
 extern e_char_t o_bpmvend[];
 extern e_char_t o_bpmvwordleft[];
 extern e_char_t o_bpmvwordright[];
+extern e_char_t o_bmvpageup[];
+extern e_char_t o_bmvpagedown[];
 extern e_char_t o_bquit[];
 extern e_char_t o_bnext[];
 extern e_char_t o_bprev[];

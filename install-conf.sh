@@ -1,6 +1,6 @@
 #!/bin/bash
 
-THEME="github-dark"
+THEME="gruvbox-dark"
 INSTALLDIR="$HOME/.config"
 
 echo "[$0] install conf: creating fresh conf directory" >&2

@@ -227,15 +227,8 @@ r_present(void)
 void
 r_winsize(OUT u32 *w, OUT u32 *h)
 {
-	if (w)
-	{
-		*w = r_w;
-	}
-	
-	if (h)
-	{
-		*h = r_h - r_barh - ((u32)p_prompt.csr >= p_prompt.len && p_prompt.csr % r_w == 0);
-	}
+	*w = r_w;
+	*h = r_h - r_barh - ((u32)p_prompt.csr >= p_prompt.len && p_prompt.csr % r_w == 0);
 }
 
 void

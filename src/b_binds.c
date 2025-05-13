@@ -14,6 +14,8 @@ static void b_pmvstart(void);
 static void b_pmvend(void);
 static void b_pmvwordleft(void);
 static void b_pmvwordright(void);
+static void b_mvpageup(void);
+static void b_mvpagedown(void);
 static void b_quit(void);
 static void b_quitpromptfail(void);
 static void b_quitpromptsuccess(void);
@@ -62,6 +64,8 @@ b_installbase(void)
 	i_bind(o_bfmvend, b_fmvend);
 	i_bind(o_bfmvwordleft, b_fmvwordleft);
 	i_bind(o_bfmvwordright, b_fmvwordright);
+	i_bind(o_bmvpageup, b_mvpageup);
+	i_bind(o_bmvpagedown, b_mvpagedown);
 	i_bind(o_bquit, b_quit);
 	i_bind(o_bnext, b_next);
 	i_bind(o_bprev, b_prev);
@@ -338,6 +342,18 @@ b_pmvwordright(void)
 	{
 		++p_prompt.csr;
 	}
+}
+
+static void
+b_mvpageup(void)
+{
+	// TODO: implement move page up.
+}
+
+static void
+b_mvpagedown(void)
+{
+	// TODO: implement move page down.
 }
 
 static void
@@ -809,7 +825,7 @@ b_search(void)
 	
 	for (usize i = f->csr + 1; i + len <= f->len; ++i)
 	{
-		for (usize j = 0; j < len && i + j < f->len; ++j)
+		for (usize j = 0; j < len; ++j)
 		{
 			if (data[j].codepoint != f->buf[i + j].codepoint)
 			{
@@ -831,7 +847,58 @@ b_search(void)
 static void
 b_revsearch(void)
 {
-	// TODO: implement reverse search.
+	b_installprompt();
+	p_beginstr("reverse search literally: ");
+	while (!p_prompt.rc)
+	{
+		w_render();
+		p_render();
+		r_present();
+		
+		e_char_t k = i_readkey();
+		if (p_iswritable(k))
+		{
+			p_writech(k, p_prompt.csr);
+			p_prompt.csr += p_prompt.csr < O_MAXPROMPTLEN;
+		}
+	}
+	p_end();
+	b_installbase();
+	
+	if (p_prompt.rc == P_FAIL)
+	{
+		return;
+	}
+	
+	f_frame_t *f = &w_state.frames[w_state.curframe];
+	
+	usize len;
+	e_char_t *data = p_getdata(&len);
+	if (!len)
+	{
+		free(data);
+		return;
+	}
+	
+	for (isize i = f->csr; i >= (isize)len; --i)
+	{
+		for (isize j = 0; j < (isize)len; ++j)
+		{
+			if (data[j].codepoint != f->buf[i - len + j].codepoint)
+			{
+				goto nextchar;
+			}
+		}
+		
+		f->csr = i - len;
+		f_savecsr(f);
+		free(data);
+		return;
+	nextchar:;
+	}
+	
+	showerr("binds: didn't find search string!");
+	free(data);
 }
 
 static void
@@ -992,39 +1059,12 @@ b_ncutline(void)
 static void
 b_zoom(void)
 {
-	u32 rw, rh;
-	r_winsize(&rw, &rh);
+	u32 x, y;
+	u32 w, h;
+	w_arrangeframe(w_state.curframe, &x, &y, &w, &h);
 	
-	if (w_state.nframes == 1)
-	{
-		w_state.frames[0].start = 0;
-		f_compbounds(
-			&w_state.frames[0],
-			rw,
-			rh / 2
-		);
-		
-		return;
-	}
-	
-	if (!w_state.curframe)
-	{
-		w_state.frames[0].start = 0;
-		f_compbounds(
-			&w_state.frames[0],
-			o_opts.masternum * rw / o_opts.masterdenom,
-			rh / 2
-		);
-	}
-	else
-	{
-		w_state.frames[w_state.curframe].start = 0;
-		f_compbounds(
-			&w_state.frames[w_state.curframe],
-			rw - o_opts.masternum * rw / o_opts.masterdenom,
-			rh / (w_state.nframes - 1) / 2
-		);
-	}
+	w_state.frames[w_state.curframe].start = 0;
+	f_compbounds(&w_state.frames[w_state.curframe], w, h / 2);
 }
 
 static void
@@ -1060,6 +1100,7 @@ b_goto(void)
 	
 	f_frame_t *f = &w_state.frames[w_state.curframe];
 	
+	// move cursor to needed line.
 	f->csr = 0;
 	while (f->csr < f->len && line)
 	{
@@ -1069,4 +1110,12 @@ b_goto(void)
 		}
 	}
 	f_savecsr(f);
+	
+	// focus selected line.
+	u32 x, y;
+	u32 w, h;
+	w_arrangeframe(w_state.curframe, &x, &y, &w, &h);
+	
+	f->start = 0;
+	f_compbounds(f, w, h / 2);
 }
