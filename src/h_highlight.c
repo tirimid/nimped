@@ -1,13 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #define H_NUMBERINIT "0123456789"
-#define H_NUMBER "xb-.0123456789aAbBcCdDeEfF"
+#define H_NUMBER "xob+-.0123456789aAbBcCdDeEfF_"
 #define H_CSPECIAL "!%&()*+,-./:;<=>?[\\]^{|}~"
 #define H_CWORDINIT "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"
 #define H_CWORD "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
 #define H_SHSPECIAL "$\\=[]!><|;{}()*?~&`:."
 #define H_SHWORDINIT H_CWORDINIT
 #define H_SHWORD H_CWORD
+#define H_JSSPECIAL "()[]{};=+-*/%<>&^|?!~:,."
+#define H_JSWORDINIT "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_$"
+#define H_JSWORD "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_$0123456789"
 
 static bool h_cmpstr(f_frame_t const *f, char const *cmp, u32 at);
 static bool h_cmpany(f_frame_t const *f, char const *cmp, u32 at);
@@ -19,6 +22,7 @@ static void h_cpreproc(OUT h_region_t *r, f_frame_t const *f, u32 from);
 static void h_ccomment(OUT h_region_t *r, f_frame_t const *f, u32 from);
 static void h_cword(OUT h_region_t *r, f_frame_t const *f, u32 from);
 static void h_shword(OUT h_region_t *r, f_frame_t const *f, u32 from);
+static void h_jsword(OUT h_region_t *r, f_frame_t const *f, u32 from);
 
 void
 h_find(OUT h_region_t *r, f_frame_t const *f, u32 from)
@@ -164,6 +168,8 @@ h_findjs(OUT h_region_t *r, f_frame_t const *f, u32 from)
 {
 	for (u32 i = from; i < f->len; ++i)
 	{
+		// TODO: implement regex literal highlight as string.
+		
 		if (h_cmpstr(f, "//", i) || h_cmpstr(f, "#!", i))
 		{
 			h_linecomment(r, f, i);
@@ -174,9 +180,33 @@ h_findjs(OUT h_region_t *r, f_frame_t const *f, u32 from)
 			h_ccomment(r, f, i);
 			return;
 		}
-		
-		// TODO: finish implementing javascript highlight.
+		else if (h_cmpany(f, H_NUMBERINIT, i))
+		{
+			h_number(r, f, i);
+			return;
+		}
+		else if (h_cmpany(f, H_JSWORDINIT, i))
+		{
+			h_jsword(r, f, i);
+			return;
+		}
+		else if (h_cmpany(f, "\"'`", i))
+		{
+			h_string(r, f, i, true, false);
+			return;
+		}
+		else if (h_cmpany(f, H_JSSPECIAL, i))
+		{
+			h_special(r, f, i, H_JSSPECIAL);
+			return;
+		}
 	}
+	
+	*r = (h_region_t)
+	{
+		.lb = f->len,
+		.ub = f->len
+	};
 }
 
 static bool
@@ -448,4 +478,26 @@ h_shword(OUT h_region_t *r, f_frame_t const *f, u32 from)
 	
 	r->fg = o_opts.normfg;
 	r->bg = o_opts.normbg;
+}
+
+static void
+h_jsword(OUT h_region_t *r, f_frame_t const *f, u32 from)
+{
+	u32 end = from;
+	while (end < f->len && strchr(H_JSWORD, f->buf[end]))
+	{
+		++end;
+	}
+	
+	*r = (h_region_t)
+	{
+		.lb = from,
+		.ub = end
+	};
+	
+	for (usize i = 0; i < o_opts.lang[O_JSMODE].nkeywords; ++i)
+	{
+	}
+	
+	// TODO: finish implementing highlight JS word.
 }
