@@ -7,12 +7,23 @@ typedef struct i_bind
 	void (*fn)(void);
 } i_bind_t;
 
+typedef enum i_macromode
+{
+	I_NOMACRO = 0,
+	I_RECMACRO,
+	I_EXECMACRO
+} i_macromode_t;
+
 static int i_bindcmp(void const *lhs, void const *rhs);
 
 static i_bind_t i_binds[O_MAXBINDS];
 static usize i_nbinds;
 static e_char_t i_curbind[O_MAXBINDLEN];
 static usize i_curbindlen;
+static i_macromode_t i_macromode;
+static e_char_t *i_macro;
+static usize i_macrocur;
+static usize i_macrolen;
 
 void
 i_unbind(void)
@@ -65,8 +76,32 @@ i_organize(void)
 e_char_t
 i_readrawkey(void)
 {
-	// TODO: implement macro system eventually.
-	return e_read();
+	if (i_macromode == I_EXECMACRO)
+	{
+		// the + 1 handles the last key of the macro, which would just infinitely
+		// repeat the macro if allowed to execute.
+		if (i_macrocur + 1 < i_macrolen)
+		{
+			return i_macro[i_macrocur++];
+		}
+		else
+		{
+			i_macromode = I_NOMACRO;
+			i_curbindlen = 0;
+			return e_read();
+		}
+	}
+	
+	e_char_t ch = e_read();
+	
+	if (i_macromode == I_RECMACRO)
+	{
+		++i_macrolen;
+		i_macro = reallocarray(i_macro, i_macrolen, sizeof(e_char_t));
+		i_macro[i_macrolen - 1] = ch;
+	}
+	
+	return ch;
 }
 
 e_char_t
@@ -128,6 +163,32 @@ found:
 	
 	i_curbindlen = 0;
 	return k;
+}
+
+void
+i_recmacro(void)
+{
+	i_macromode = I_RECMACRO;
+	i_macrolen = 0;
+}
+
+void
+i_stoprecmacro(void)
+{
+	i_macromode = I_NOMACRO;
+}
+
+bool
+i_isrecmacro(void)
+{
+	return i_macromode == I_RECMACRO;
+}
+
+void
+i_execmacro(void)
+{
+	i_macromode = I_EXECMACRO;
+	i_macrocur = 0;
 }
 
 static int

@@ -1,6 +1,27 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 void
+showinfo(char const *fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+	
+	char msg[512] = "info: ";
+	vsnprintf(&msg[6], sizeof(msg) - 6, fmt, args);
+	
+	if (w_state.running)
+	{
+		r_setbarstr(msg);
+	}
+	else
+	{
+		fprintf(stderr, "%s\n", msg);
+	}
+	
+	va_end(args);
+}
+
+void
 showerr(char const *fmt, ...)
 {
 	va_list args;

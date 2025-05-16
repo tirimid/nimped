@@ -33,8 +33,6 @@ e_char_t o_bpmvstart[] = {O_KCTL('a'), O_KEND};
 e_char_t o_bpmvend[] = {O_KCTL('e'), O_KEND};
 e_char_t o_bpmvwordleft[] = {O_KMETA('b'), O_KEND};
 e_char_t o_bpmvwordright[] = {O_KMETA('f'), O_KEND};
-e_char_t o_bmvpageup[] = {O_KMETA('v'), O_KEND};
-e_char_t o_bmvpagedown[] = {O_KCTL('v'), O_KEND};
 e_char_t o_bquit[] = {O_KCTL('x'), O_KEND};
 e_char_t o_bnext[] = {O_K('n'), O_KEND};
 e_char_t o_bprev[] = {O_K('p'), O_KEND};
@@ -63,6 +61,8 @@ e_char_t o_bncopyline[] = {O_K('q'), O_K('c'), O_KEND};
 e_char_t o_bncutline[] = {O_K('q'), O_K('d'), O_KEND};
 e_char_t o_bzoom[] = {O_K('z'), O_KEND};
 e_char_t o_bgoto[] = {O_K('g'), O_KEND};
+e_char_t o_brecmacro[] = {O_KFN(3), O_KEND};
+e_char_t o_bexecmacro[] = {O_KFN(4), O_KEND};
 
 o_opts_t o_opts;
 
@@ -238,7 +238,6 @@ o_parse(void)
 	// lang conf options.
 	o_readlangconf(fp, "ckeyword", "cprimitive", O_CMODE);
 	o_readlangconf(fp, "shkeyword", "shprimitive", O_SHMODE);
-	o_readlangconf(fp, "pykeyword", "pyprimitive", O_PYMODE);
 	o_readlangconf(fp, "jskeyword", "jsprimitive", O_JSMODE);
 	
 	fclose(fp);

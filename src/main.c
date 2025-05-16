@@ -13,6 +13,7 @@
 #include <string.h>
 
 // system dependencies.
+#include <dirent.h>
 #include <pwd.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>

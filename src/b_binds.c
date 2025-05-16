@@ -14,8 +14,6 @@ static void b_pmvstart(void);
 static void b_pmvend(void);
 static void b_pmvwordleft(void);
 static void b_pmvwordright(void);
-static void b_mvpageup(void);
-static void b_mvpagedown(void);
 static void b_quit(void);
 static void b_quitpromptfail(void);
 static void b_quitpromptsuccess(void);
@@ -51,6 +49,8 @@ static void b_ncopyline(void);
 static void b_ncutline(void);
 static void b_zoom(void);
 static void b_goto(void);
+static void b_recmacro(void);
+static void b_execmacro(void);
 
 void
 b_installbase(void)
@@ -64,8 +64,6 @@ b_installbase(void)
 	i_bind(o_bfmvend, b_fmvend);
 	i_bind(o_bfmvwordleft, b_fmvwordleft);
 	i_bind(o_bfmvwordright, b_fmvwordright);
-	i_bind(o_bmvpageup, b_mvpageup);
-	i_bind(o_bmvpagedown, b_mvpagedown);
 	i_bind(o_bquit, b_quit);
 	i_bind(o_bnext, b_next);
 	i_bind(o_bprev, b_prev);
@@ -85,11 +83,13 @@ b_installbase(void)
 	i_bind(o_bncutline, b_ncutline);
 	i_bind(o_bzoom, b_zoom);
 	i_bind(o_bgoto, b_goto);
+	i_bind(o_brecmacro, b_recmacro);
+	i_bind(o_bexecmacro, b_execmacro);
 	i_organize();
 	
 	w_state.writeinput = false;
 	
-	r_setbarstr(O_BASENAME);
+	showinfo("%s", O_BASENAME);
 }
 
 void
@@ -109,7 +109,7 @@ b_installwrite(void)
 	
 	w_state.writeinput = true;
 	
-	r_setbarstr(O_WRITENAME);
+	showinfo("%s", O_WRITENAME);
 }
 
 void
@@ -342,18 +342,6 @@ b_pmvwordright(void)
 	{
 		++p_prompt.csr;
 	}
-}
-
-static void
-b_mvpageup(void)
-{
-	// TODO: implement move page up.
-}
-
-static void
-b_mvpagedown(void)
-{
-	// TODO: implement move page down.
 }
 
 static void
@@ -608,7 +596,7 @@ b_undo(void)
 	f_frame_t *f = &w_state.frames[w_state.curframe];
 	if (!f->histlen)
 	{
-		showerr("binds: nothing to undo!");
+		showinfo("binds: nothing to undo");
 		return;
 	}
 	
@@ -840,7 +828,7 @@ b_search(void)
 	nextchar:;
 	}
 	
-	showerr("binds: didn't find search string!");
+	showinfo("binds: didn't find search string");
 	free(data);
 }
 
@@ -897,7 +885,7 @@ b_revsearch(void)
 	nextchar:;
 	}
 	
-	showerr("binds: didn't find search string!");
+	showinfo("binds: didn't find search string");
 	free(data);
 }
 
@@ -1076,7 +1064,7 @@ b_ncopyline(void)
 	
 	if (!lines)
 	{
-		showerr("binds: ignoring copy of zero lines!");
+		showinfo("binds: ignoring copy of zero lines");
 		return;
 	}
 	
@@ -1136,7 +1124,7 @@ b_ncutline(void)
 	
 	if (!lines)
 	{
-		showerr("binds: ignoring cut of zero lines!");
+		showinfo("binds: ignoring cut of zero lines");
 		return;
 	}
 	
@@ -1230,4 +1218,29 @@ b_goto(void)
 	
 	f->start = 0;
 	f_compbounds(f, w, h / 2);
+}
+
+static void
+b_recmacro(void)
+{
+	if (!i_isrecmacro())
+	{
+		showinfo("binds: recording macro");
+		i_recmacro();
+	}
+}
+
+static void
+b_execmacro(void)
+{
+	if (i_isrecmacro())
+	{
+		showinfo("binds: stopped recording macro");
+		i_stoprecmacro();
+	}
+	else
+	{
+		showinfo("binds: executing macro");
+		i_execmacro();
+	}
 }

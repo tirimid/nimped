@@ -53,7 +53,6 @@ typedef enum o_langmode
 {
 	O_CMODE = 0,
 	O_SHMODE,
-	O_PYMODE,
 	O_JSMODE,
 	
 	O_LANGMODE_END
@@ -74,8 +73,6 @@ extern e_char_t o_bpmvstart[];
 extern e_char_t o_bpmvend[];
 extern e_char_t o_bpmvwordleft[];
 extern e_char_t o_bpmvwordright[];
-extern e_char_t o_bmvpageup[];
-extern e_char_t o_bmvpagedown[];
 extern e_char_t o_bquit[];
 extern e_char_t o_bnext[];
 extern e_char_t o_bprev[];
@@ -104,6 +101,8 @@ extern e_char_t o_bncopyline[];
 extern e_char_t o_bncutline[];
 extern e_char_t o_bzoom[];
 extern e_char_t o_bgoto[];
+extern e_char_t o_brecmacro[];
+extern e_char_t o_bexecmacro[];
 
 typedef struct o_opts
 {

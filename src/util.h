@@ -17,6 +17,7 @@ typedef size_t usize;
 typedef float f32;
 typedef double f64;
 
+void showinfo(char const *fmt, ...);
 void showerr(char const *fmt, ...);
 u64 fileid(char const *path, bool deref);
 bool ispathsame(char const *patha, char const *pathb);

@@ -87,7 +87,95 @@ p_getdatastr(void)
 void
 p_pathcomplete(void)
 {
-	// TODO: implement path completion.
+	if ((u32)p_prompt.csr < p_prompt.len)
+	{
+		return;
+	}
+	
+	char *promptdata = p_getdatastr();
+	char path[PATH_MAX + 1] = {0};
+	strncpy(path, promptdata, PATH_MAX);
+	free(promptdata);
+	
+	usize len = strlen(path);
+	if (len >= PATH_MAX)
+	{
+		return;
+	}
+	
+	char name[PATH_MAX + 1] = {0}, dir[PATH_MAX + 1] = {0};
+	strncpy(dir, path, PATH_MAX);
+	char *firstslash = strchr(dir, '/'), *lastslash = strrchr(dir, '/');
+	
+	char *firstch = dir;
+	while (*firstch && isspace(*firstch))
+	{
+		++firstch;
+	}
+	
+	if (!lastslash)
+	{
+		dir[0] = '.';
+		dir[1] = 0;
+		strncpy(name, path, sizeof(name));
+	}
+	else if (firstch && firstch == firstslash && firstslash == lastslash)
+	{
+		strncpy(name, &lastslash[1], PATH_MAX);
+		lastslash[1] = 0;
+	}
+	else
+	{
+		strncpy(name, &lastslash[1], PATH_MAX);
+		lastslash[0] = 0;
+	}
+	
+	usize namelen = strlen(name);
+	
+	DIR *dp = opendir(dir);
+	if (!dp)
+	{
+		return;
+	}
+	
+	for (struct dirent *de = readdir(dp); de; de = readdir(dp))
+	{
+		if (strncasecmp(name, de->d_name, namelen)
+			|| (de->d_type != DT_DIR && de->d_type != DT_REG)
+			|| !strcmp(".", de->d_name)
+			|| !strcmp("..", de->d_name))
+		{
+			continue;
+		}
+		
+		char newpath[PATH_MAX + 1] = {0};
+		strcpy(newpath, dir);
+		
+		// only add '/' if not root.
+		if (firstch && firstch != lastslash)
+		{
+			strcat(newpath, "/");
+		}
+		
+		strcat(newpath, de->d_name);
+		if (de->d_type == DT_DIR)
+		{
+			strcat(newpath, "/");
+		}
+		
+		usize enewlen;
+		e_char_t *enewpath = e_fromstr(&enewlen, newpath);
+		enewlen = enewlen + p_prompt.start < O_MAXPROMPTLEN ? enewlen : O_MAXPROMPTLEN - p_prompt.start;
+		memcpy(&p_prompt.data[p_prompt.start], enewpath, sizeof(e_char_t) * enewlen);
+		free(enewpath);
+		p_prompt.len = p_prompt.start + enewlen;
+		p_prompt.csr = p_prompt.len;
+		
+		closedir(dp);
+		return;
+	}
+	
+	closedir(dp);
 }
 
 bool

@@ -47,10 +47,6 @@ h_find(OUT h_region_t *r, f_frame_t const *f, u32 from)
 	{
 		h_findsh(r, f, from);
 	}
-	else if (!strcmp(ext, "py"))
-	{
-		h_findpy(r, f, from);
-	}
 	else if (!strcmp(ext, "js"))
 	{
 		h_findjs(r, f, from);
@@ -159,17 +155,11 @@ h_findsh(OUT h_region_t *r, f_frame_t const *f, u32 from)
 }
 
 void
-h_findpy(OUT h_region_t *r, f_frame_t const *f, u32 from)
-{
-	// TODO: implement python highlight.
-}
-
-void
 h_findjs(OUT h_region_t *r, f_frame_t const *f, u32 from)
 {
 	for (u32 i = from; i < f->len; ++i)
 	{
-		// TODO: implement regex literal highlight as string.
+		// regex highlight will not be implemented.
 		
 		if (h_cmpstr(f, "//", i) || h_cmpstr(f, "#!", i))
 		{
