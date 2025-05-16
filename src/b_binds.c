@@ -1074,6 +1074,12 @@ b_ncopyline(void)
 	u64 lines = strtoll(linestr, NULL, 10);
 	free(linestr);
 	
+	if (!lines)
+	{
+		showerr("binds: ignoring copy of zero lines!");
+		return;
+	}
+	
 	f_frame_t *f = &w_state.frames[w_state.curframe];
 	
 	u32 begin = f->csr;
@@ -1083,9 +1089,13 @@ b_ncopyline(void)
 	}
 	
 	u32 end = begin;
-	while (end < f->csr && lines)
+	while (end < f->len)
 	{
 		lines -= f->buf[end].codepoint == '\n';
+		if (!lines)
+		{
+			break;
+		}
 		++end;
 	}
 	
@@ -1097,7 +1107,65 @@ b_ncopyline(void)
 static void
 b_ncutline(void)
 {
-	// TODO: implement n-line cut.
+	b_installnumberprompt();
+	p_beginstr("cut lines: ");
+	while (!p_prompt.rc)
+	{
+		w_render();
+		p_render();
+		r_present();
+		
+		e_char_t k = i_readkey();
+		if (k.codepoint < 128 && isdigit(k.codepoint))
+		{
+			p_writech(k, p_prompt.csr);
+			p_prompt.csr += p_prompt.csr < O_MAXPROMPTLEN;
+		}
+	}
+	p_end();
+	b_installbase();
+	
+	if (p_prompt.rc == P_FAIL)
+	{
+		return;
+	}
+	
+	char *linestr = p_getdatastr();
+	u64 lines = strtoll(linestr, NULL, 10);
+	free(linestr);
+	
+	if (!lines)
+	{
+		showerr("binds: ignoring cut of zero lines!");
+		return;
+	}
+	
+	f_frame_t *f = &w_state.frames[w_state.curframe];
+	
+	u32 begin = f->csr;
+	while (begin && f->buf[begin - 1].codepoint != '\n')
+	{
+		--begin;
+	}
+	
+	u32 end = begin;
+	while (end < f->len)
+	{
+		lines -= f->buf[end].codepoint == '\n';
+		if (!lines)
+		{
+			break;
+		}
+		++end;
+	}
+	
+	w_state.clipboardlen = end - begin;
+	w_state.clipboard = reallocarray(w_state.clipboard, end - begin, sizeof(e_char_t));
+	memcpy(w_state.clipboard, &f->buf[begin], sizeof(e_char_t) * (end - begin));
+	f_erase(f, begin, end + (end < f->len));
+	
+	f->csr = begin;
+	f_loadcsr(f);
 }
 
 static void
