@@ -353,6 +353,23 @@ h_trykeyword(
 		}
 	}
 	
+	for (usize i = 0; i < o_opts.lang[lang].nprimitives; ++i)
+	{
+		u16 primlen = o_opts.lang[lang].primitivelen[i];
+		if (end - from != primlen)
+		{
+			continue;
+		}
+		
+		e_char_t const *prim = o_opts.lang[lang].primitives[i];
+		if (!memcmp(prim, &f->buf[from], sizeof(e_char_t) * primlen))
+		{
+			r->fg = o_opts.primitivefg;
+			r->bg = o_opts.primitivebg;
+			return true;
+		}
+	}
+	
 	return false;
 }
 

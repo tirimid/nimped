@@ -71,7 +71,7 @@ static i32 o_getraw(char const *name, FILE *fp, char const *key, OUT char val[])
 static i32 o_getu32(char const *name, FILE *fp, char const *key, OUT u32 *val);
 static i32 o_getcolor(char const *name, FILE *fp, char const *key, OUT u8 *val);
 static bool o_nthraw(char const *name, FILE *fp, char const *key, OUT char val[], i32 n);
-static void o_readlangconf(FILE *fp, char const *kwkey, o_langmode_t mode);
+static void o_readlangconf(FILE *fp, char const *kwkey, char const *primkey, o_langmode_t mode);
 
 // these colors will be usable as named palette colors in config.
 // add the palettes of your favorite themes here.
@@ -142,7 +142,21 @@ static o_namedcolor_t o_namedcolors[] =
 	{"@ghd.lightpurple", 183},
 	{"@ghd.darkpurple", 135},
 	{"@ghd.lightgreen", 114},
-	{"@ghd.darkgreen", 76}
+	{"@ghd.darkgreen", 76},
+	
+	// vs dark.
+	{"@vsd.bg", 233},
+	{"@vsd.fg0", 188},
+	{"@vsd.fg1", 108},
+	{"@vsd.beige", 180},
+	{"@vsd.aqua0", 50},
+	{"@vsd.aqua1", 108},
+	{"@vsd.purple", 169},
+	{"@vsd.green", 64},
+	{"@vsd.blue0", 152},
+	{"@vsd.blue1", 30},
+	{"@vsd.blue2", 39},
+	{"@vsd.yellow", 230}
 };
 
 i32
@@ -199,6 +213,8 @@ o_parse(void)
 		|| o_getcolor(O_COLORCONF, fp, "specialbg", &o_opts.specialbg)
 		|| o_getcolor(O_COLORCONF, fp, "keywordfg", &o_opts.keywordfg)
 		|| o_getcolor(O_COLORCONF, fp, "keywordbg", &o_opts.keywordbg)
+		|| o_getcolor(O_COLORCONF, fp, "primitivefg", &o_opts.primitivefg)
+		|| o_getcolor(O_COLORCONF, fp, "primitivebg", &o_opts.primitivebg)
 		|| o_getcolor(O_COLORCONF, fp, "typefg", &o_opts.typefg)
 		|| o_getcolor(O_COLORCONF, fp, "typebg", &o_opts.typebg)
 		|| o_getcolor(O_COLORCONF, fp, "emphfg", &o_opts.emphfg)
@@ -220,10 +236,10 @@ o_parse(void)
 	}
 	
 	// lang conf options.
-	o_readlangconf(fp, "ckeyword", O_CMODE);
-	o_readlangconf(fp, "shkeyword", O_SHMODE);
-	o_readlangconf(fp, "pykeyword", O_PYMODE);
-	o_readlangconf(fp, "jskeyword", O_JSMODE);
+	o_readlangconf(fp, "ckeyword", "cprimitive", O_CMODE);
+	o_readlangconf(fp, "shkeyword", "shprimitive", O_SHMODE);
+	o_readlangconf(fp, "pykeyword", "pyprimitive", O_PYMODE);
+	o_readlangconf(fp, "jskeyword", "jsprimitive", O_JSMODE);
 	
 	fclose(fp);
 	return 0;
@@ -415,7 +431,12 @@ o_nthraw(char const *name, FILE *fp, char const *key, OUT char val[], i32 n)
 }
 
 static void
-o_readlangconf(FILE *fp, char const *kwkey, o_langmode_t mode)
+o_readlangconf(
+	FILE *fp,
+	char const *kwkey,
+	char const *primkey,
+	o_langmode_t mode
+)
 {
 	char val[O_CONFVALLEN] = {0};
 	
@@ -433,5 +454,21 @@ o_readlangconf(FILE *fp, char const *kwkey, o_langmode_t mode)
 		o_opts.lang[mode].keywords[*nkw] = kw;
 		o_opts.lang[mode].keywordlen[*nkw] = kwlen;
 		++*nkw;
+	}
+	
+	for (i32 i = 0; o_nthraw(O_LANGCONF, fp, primkey, val, i); ++i)
+	{
+		usize *nprim = &o_opts.lang[mode].nprimitives;
+		if (*nprim >= O_MAXKEYWORDS)
+		{
+			break;
+		}
+		
+		usize primlen;
+		e_char_t *prim = e_fromstr(&primlen, val);
+		
+		o_opts.lang[mode].primitives[*nprim] = prim;
+		o_opts.lang[mode].primitivelen[*nprim] = primlen;
+		++*nprim;
 	}
 }

@@ -128,6 +128,7 @@ typedef struct o_opts
 	u8 macrofg, macrobg;
 	u8 specialfg, specialbg;
 	u8 keywordfg, keywordbg;
+	u8 primitivefg, primitivebg;
 	u8 typefg, typebg;
 	u8 emphfg, emphbg;
 	u8 stringfg, stringbg;
@@ -136,9 +137,15 @@ typedef struct o_opts
 	// language mode options.
 	struct
 	{
+		// control keywords.
 		usize nkeywords;
 		e_char_t *keywords[O_MAXKEYWORDS];
 		u16 keywordlen[O_MAXKEYWORDS];
+		
+		// primitive type keywords (although you may use it for something else).
+		usize nprimitives;
+		e_char_t *primitives[O_MAXKEYWORDS];
+		u16 primitivelen[O_MAXKEYWORDS];
 	} lang[O_LANGMODE_END];
 } o_opts_t;
 
