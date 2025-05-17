@@ -89,7 +89,7 @@ b_installbase(void)
 	
 	w_state.writeinput = false;
 	
-	showinfo("%s", O_BASENAME);
+	r_setbarstr(O_BASENAME);
 }
 
 void
@@ -109,7 +109,7 @@ b_installwrite(void)
 	
 	w_state.writeinput = true;
 	
-	showinfo("%s", O_WRITENAME);
+	r_setbarstr(O_WRITENAME);
 }
 
 void
