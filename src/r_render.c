@@ -236,7 +236,7 @@ r_setbar(e_char_t const *s, usize n)
 {
 	r_barlen = n > O_MAXBARLEN ? O_MAXBARLEN : n;
 	
-	memcpy(r_bar, s, sizeof(e_char_t) * r_barlen);
+	hmemcpy(r_bar, s, sizeof(e_char_t) * r_barlen);
 	
 	r_barh = (r_barlen + r_w - 1) / r_w;
 	r_barh += !r_barh;
@@ -268,8 +268,8 @@ r_sigwinch(int arg)
 	r_w = ws.ws_col;
 	r_h = ws.ws_row;
 	
-	r_cellchars = reallocarr(r_cellchars, r_w * r_h, sizeof(e_char_t));
-	r_cellattrs = reallocarr(r_cellattrs, r_w * r_h, sizeof(r_attr_t));
+	r_cellchars = hreallocarray(r_cellchars, r_w * r_h, sizeof(e_char_t));
+	r_cellattrs = hreallocarray(r_cellattrs, r_w * r_h, sizeof(r_attr_t));
 	
 	r_setbar(r_bar, r_barlen); // recompute bar.
 }

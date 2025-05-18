@@ -40,6 +40,7 @@
 	"Additional resources:\n" \
 	"\n" \
 	"\tSource code: https://git.tirimid.net/nimped\n" \
+	"\tWriteup and docs: https://tirimid.net/tirimid/nimped.html\n" \
 	"\n" \
 	"(The greeter logo seen above was generated with the use of Figlet)\n"
 

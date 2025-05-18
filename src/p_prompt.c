@@ -12,7 +12,7 @@ p_begin(e_char_t const *prompt, u32 len)
 	
 	p_prompt.len = len;
 	p_prompt.start = len;
-	memcpy(&p_prompt.data[0], prompt, sizeof(e_char_t) * len);
+	hmemcpy(&p_prompt.data[0], prompt, sizeof(e_char_t) * len);
 	
 	p_prompt.csr = len;
 	p_prompt.rc = P_NONE;
@@ -47,19 +47,19 @@ p_write(e_char_t const *data, u32 pos, u32 n)
 		n = O_MAXPROMPTLEN - p_prompt.len;
 	}
 	
-	memmove(
+	hmemmove(
 		&p_prompt.data[pos + n],
 		&p_prompt.data[pos],
 		sizeof(e_char_t) * (p_prompt.len - pos)
 	);
-	memcpy(&p_prompt.data[pos], data, sizeof(e_char_t) * n);
+	hmemcpy(&p_prompt.data[pos], data, sizeof(e_char_t) * n);
 	p_prompt.len += n;
 }
 
 void
 p_erase(u32 lb, u32 ub)
 {
-	memmove(&p_prompt.data[lb], &p_prompt.data[ub], sizeof(e_char_t) * (p_prompt.len - ub));
+	hmemmove(&p_prompt.data[lb], &p_prompt.data[ub], sizeof(e_char_t) * (p_prompt.len - ub));
 	p_prompt.len -= ub - lb;
 }
 
@@ -74,7 +74,7 @@ p_getdata(OUT usize *len)
 {
 	*len = p_prompt.len - p_prompt.start;
 	e_char_t *data = calloc(*len, sizeof(e_char_t));
-	memcpy(data, &p_prompt.data[p_prompt.start], sizeof(e_char_t) * *len);
+	hmemcpy(data, &p_prompt.data[p_prompt.start], sizeof(e_char_t) * *len);
 	return data;
 }
 
@@ -166,7 +166,7 @@ p_pathcomplete(void)
 		usize enewlen;
 		e_char_t *enewpath = e_fromstr(&enewlen, newpath);
 		enewlen = enewlen + p_prompt.start < O_MAXPROMPTLEN ? enewlen : O_MAXPROMPTLEN - p_prompt.start;
-		memcpy(&p_prompt.data[p_prompt.start], enewpath, sizeof(e_char_t) * enewlen);
+		hmemcpy(&p_prompt.data[p_prompt.start], enewpath, sizeof(e_char_t) * enewlen);
 		free(enewpath);
 		p_prompt.len = p_prompt.start + enewlen;
 		p_prompt.csr = p_prompt.len;

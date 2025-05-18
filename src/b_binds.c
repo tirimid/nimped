@@ -1001,8 +1001,8 @@ b_copyline(void)
 	}
 	
 	w_state.clipboardlen = end - begin;
-	w_state.clipboard = reallocarr(w_state.clipboard, end - begin, sizeof(e_char_t));
-	memcpy(w_state.clipboard, &f->buf[begin], sizeof(e_char_t) * (end - begin));
+	w_state.clipboard = hreallocarray(w_state.clipboard, end - begin, sizeof(e_char_t));
+	hmemcpy(w_state.clipboard, &f->buf[begin], sizeof(e_char_t) * (end - begin));
 }
 
 static void
@@ -1024,8 +1024,8 @@ b_cutline(void)
 	f_savecsr(f);
 	
 	w_state.clipboardlen = end - begin;
-	w_state.clipboard = reallocarr(w_state.clipboard, end - begin, sizeof(e_char_t));
-	memcpy(w_state.clipboard, &f->buf[begin], sizeof(e_char_t) * (end - begin));
+	w_state.clipboard = hreallocarray(w_state.clipboard, end - begin, sizeof(e_char_t));
+	hmemcpy(w_state.clipboard, &f->buf[begin], sizeof(e_char_t) * (end - begin));
 	f_erase(f, begin, end + (end < f->len));
 	
 	f->csr = begin;
@@ -1088,8 +1088,8 @@ b_ncopyline(void)
 	}
 	
 	w_state.clipboardlen = end - begin;
-	w_state.clipboard = reallocarr(w_state.clipboard, end - begin, sizeof(e_char_t));
-	memcpy(w_state.clipboard, &f->buf[begin], sizeof(e_char_t) * (end - begin));
+	w_state.clipboard = hreallocarray(w_state.clipboard, end - begin, sizeof(e_char_t));
+	hmemcpy(w_state.clipboard, &f->buf[begin], sizeof(e_char_t) * (end - begin));
 }
 
 static void
@@ -1148,8 +1148,8 @@ b_ncutline(void)
 	}
 	
 	w_state.clipboardlen = end - begin;
-	w_state.clipboard = reallocarr(w_state.clipboard, end - begin, sizeof(e_char_t));
-	memcpy(w_state.clipboard, &f->buf[begin], sizeof(e_char_t) * (end - begin));
+	w_state.clipboard = hreallocarray(w_state.clipboard, end - begin, sizeof(e_char_t));
+	hmemcpy(w_state.clipboard, &f->buf[begin], sizeof(e_char_t) * (end - begin));
 	f_erase(f, begin, end + (end < f->len));
 	
 	f->csr = begin;

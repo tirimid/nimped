@@ -97,7 +97,7 @@ i_readrawkey(void)
 	if (i_macromode == I_RECMACRO)
 	{
 		++i_macrolen;
-		i_macro = reallocarr(i_macro, i_macrolen, sizeof(e_char_t));
+		i_macro = hreallocarray(i_macro, i_macrolen, sizeof(e_char_t));
 		i_macro[i_macrolen - 1] = ch;
 	}
 	

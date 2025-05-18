@@ -73,25 +73,43 @@ fileext(char const *path)
 	return s ? s + 1 : "";
 }
 
-bool 
-check_mult_overflow(size_t n1, size_t n2)
-{
-	// should in theory work
-	size_t div1 = SIZE_MAX / n1;
-	if (div1 < n2)
-	{
-		return true;
-	}
-	return false;
-}
-
 void *
-reallocarr(void *ptr, size_t nmemb, size_t size)
+hreallocarray(void *ptr, usize nmemb, usize size)
 {
-	if (check_mult_overflow(nmemb, size))
+	if (!nmemb)
+	{
+		return realloc(ptr, 1);
+	}
+	
+	// check for overflow, as reallocarray() would.
+	volatile usize mul = nmemb * size;
+	if (mul / nmemb != size)
 	{
 		errno = ENOMEM;
 		return NULL;
 	}
+	
 	return realloc(ptr, nmemb * size);
+}
+
+void *
+hmemcpy(void *dst, void const *src, usize n)
+{
+	if (!n)
+	{
+		return dst;
+	}
+	
+	return memcpy(dst, src, n);
+}
+
+void *
+hmemmove(void *dst, void const *src, usize n)
+{
+	if (!n)
+	{
+		return dst;
+	}
+	
+	return memmove(dst, src, n);
 }

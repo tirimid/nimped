@@ -115,7 +115,7 @@ w_destroyframe(usize idx)
 		return;
 	}
 	
-	memmove(
+	hmemmove(
 		&w_state.frames[idx],
 		&w_state.frames[idx + 1],
 		sizeof(f_frame_t) * (w_state.nframes - idx)
