@@ -72,3 +72,26 @@ fileext(char const *path)
 	char const *s = strrchr(path, '.');
 	return s ? s + 1 : "";
 }
+
+bool 
+check_mult_overflow(size_t n1, size_t n2)
+{
+	// should in theory work
+	size_t div1 = SIZE_MAX / n1;
+	if (div1 < n2)
+	{
+		return true;
+	}
+	return false;
+}
+
+void *
+reallocarr(void *ptr, size_t nmemb, size_t size)
+{
+	if (check_mult_overflow(nmemb, size))
+	{
+		errno = ENOMEM;
+		return NULL;
+	}
+	return realloc(ptr, nmemb * size);
+}
