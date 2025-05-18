@@ -268,8 +268,8 @@ r_sigwinch(int arg)
 	r_w = ws.ws_col;
 	r_h = ws.ws_row;
 	
-	r_cellchars = reallocarray(r_cellchars, r_w * r_h, sizeof(e_char_t));
-	r_cellattrs = reallocarray(r_cellattrs, r_w * r_h, sizeof(r_attr_t));
+	r_cellchars = reallocarr(r_cellchars, r_w * r_h, sizeof(e_char_t));
+	r_cellattrs = reallocarr(r_cellattrs, r_w * r_h, sizeof(r_attr_t));
 	
 	r_setbar(r_bar, r_barlen); // recompute bar.
 }

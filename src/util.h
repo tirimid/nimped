@@ -22,3 +22,6 @@ void showerr(char const *fmt, ...);
 u64 fileid(char const *path, bool deref);
 bool ispathsame(char const *patha, char const *pathb);
 char const *fileext(char const *path);
+
+bool check_mult_overflow(size_t n1, size_t n2);
+void *reallocarr(void *ptr, size_t nmemb, size_t size);

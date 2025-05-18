@@ -59,7 +59,7 @@ f_fromfile(OUT f_frame_t *f, char const *file)
 		if (buflen >= bufcap)
 		{
 			bufcap *= 2;
-			buf = reallocarray(buf, bufcap, sizeof(e_char_t));
+			buf = reallocarr(buf, bufcap, sizeof(e_char_t));
 		}
 		
 		buf[buflen++] = ch;
@@ -326,7 +326,7 @@ f_write(f_frame_t *f, e_char_t const *data, u32 pos, usize n)
 	if (newcap != f->cap)
 	{
 		f->cap = newcap;
-		f->buf = reallocarray(f->buf, f->cap, sizeof(e_char_t));
+		f->buf = reallocarr(f->buf, f->cap, sizeof(e_char_t));
 	}
 	
 	memmove(&f->buf[pos + n], &f->buf[pos], sizeof(e_char_t) * (f->len - pos));
@@ -345,7 +345,7 @@ f_write(f_frame_t *f, e_char_t const *data, u32 pos, usize n)
 		if (f->histlen >= f->histcap)
 		{
 			f->histcap *= 2;
-			f->hist = reallocarray(f->hist, f->histcap, sizeof(f_hist_t));
+			f->hist = reallocarr(f->hist, f->histcap, sizeof(f_hist_t));
 		}
 		
 		f->hist[f->histlen++] = (f_hist_t)
@@ -367,7 +367,7 @@ f_erase(f_frame_t *f, u32 lb, u32 ub)
 	f_hist_t *h = f->histlen ? &f->hist[f->histlen - 1] : NULL;
 	if (h && h->type == F_ERASE && h->erase.lb == ub)
 	{
-		h->erase.data = reallocarray(h->erase.data, h->erase.ub - lb, sizeof(e_char_t));
+		h->erase.data = reallocarr(h->erase.data, h->erase.ub - lb, sizeof(e_char_t));
 		memmove(&h->erase.data[ub - lb], h->erase.data, sizeof(e_char_t) * (h->erase.ub - h->erase.lb));
 		memcpy(h->erase.data, &f->buf[lb], sizeof(e_char_t) * (ub - lb));
 		h->erase.lb = lb;
@@ -377,7 +377,7 @@ f_erase(f_frame_t *f, u32 lb, u32 ub)
 		if (f->histlen >= f->histcap)
 		{
 			f->histcap *= 2;
-			f->hist = reallocarray(f->hist, f->histcap, sizeof(f_hist_t));
+			f->hist = reallocarr(f->hist, f->histcap, sizeof(f_hist_t));
 		}
 		
 		e_char_t *data = calloc(ub - lb, sizeof(e_char_t));
@@ -453,7 +453,7 @@ f_breakhist(f_frame_t *f)
 	if (f->len >= f->cap)
 	{
 		f->cap *= 2;
-		f->hist = reallocarray(f->hist, f->cap, sizeof(f_hist_t));
+		f->hist = reallocarr(f->hist, f->cap, sizeof(f_hist_t));
 	}
 	
 	f->hist[f->len++] = (f_hist_t)
