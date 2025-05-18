@@ -37,6 +37,8 @@ Or, for help information:
 $ nimped -h
 ```
 
+You can use a non-default conf directory with the `-o` CLI option.
+
 ## Contributing
 
 You can contribute to the project by creating a pull request. Fixes and features

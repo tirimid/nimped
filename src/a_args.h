@@ -2,6 +2,7 @@
 
 typedef struct a_args
 {
+	char const *confdir;
 	char const *files[O_MAXFILES];
 	usize nfiles;
 	bool create;

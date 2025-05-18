@@ -247,21 +247,41 @@ o_parse(void)
 static FILE *
 o_openconf(char const *file)
 {
-	char const *home = getenv("HOME");
-	if (!home)
+	char path[PATH_MAX + 1] = {0};
+	
+	if (a_args.confdir)
 	{
-		struct passwd *pw = getpwuid(getuid());
-		if (!pw)
+		usize len = snprintf(path, PATH_MAX, "%s", a_args.confdir);
+		
+		char fixed[PATH_MAX + 1] = {0};
+		if (len && path[len - 1] != '/')
 		{
-			showerr("options: failed on getpwuid() getting home directory!");
-			return NULL;
+			snprintf(fixed, PATH_MAX, "%s/", path);
+		}
+		else
+		{
+			snprintf(fixed, PATH_MAX, "%s", path);
 		}
 		
-		home = pw->pw_dir;
+		snprintf(path, PATH_MAX, "%s%s", fixed, file);
 	}
-	
-	char path[PATH_MAX + 1] = {0};
-	snprintf(path, PATH_MAX, "%s/%s/%s", home, O_CONFDIR, file);
+	else
+	{
+		char const *home = getenv("HOME");
+		if (!home)
+		{
+			struct passwd *pw = getpwuid(getuid());
+			if (!pw)
+			{
+				showerr("options: failed on getpwuid() getting home directory!");
+				return NULL;
+			}
+			
+			home = pw->pw_dir;
+		}
+		
+		snprintf(path, PATH_MAX, "%s/%s/%s", home, O_CONFDIR, file);
+	}
 	
 	FILE *fp = fopen(path, "rb");
 	if (!fp)

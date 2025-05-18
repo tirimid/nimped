@@ -8,7 +8,7 @@ i32
 a_parse(i32 argc, char const *argv[])
 {
 	i32 ch;
-	while (ch = getopt(argc, (char *const *)argv, "ch"), ch != -1)
+	while (ch = getopt(argc, (char *const *)argv, "cho:"), ch != -1)
 	{
 		switch (ch)
 		{
@@ -18,6 +18,9 @@ a_parse(i32 argc, char const *argv[])
 		case 'h':
 			a_usage(argv[0]);
 			exit(0);
+		case 'o':
+			a_args.confdir = optarg;
+			break;
 		default:
 			return 1;
 		}
@@ -60,8 +63,9 @@ a_usage(char const *name)
 		"\t%s [options] files\n"
 		"\n"
 		"Options:\n"
-		"\t-c  Create files if they don't exist\n"
-		"\t-h  Display this help information\n",
+		"\t-c      Create files if they don't exist\n"
+		"\t-h      Display this help information\n"
+		"\t-o dir  Use a different config directory\n",
 		name
 	);
 }
