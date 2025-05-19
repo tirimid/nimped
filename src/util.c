@@ -113,3 +113,24 @@ hmemmove(void *dst, void const *src, usize n)
 	
 	return memmove(dst, src, n);
 }
+
+u64
+unixus(void)
+{
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	return (u64)tv.tv_sec * 1000000 + (u64)tv.tv_usec;
+}
+
+void
+begintimer(OUT u64 *timer)
+{
+	*timer = unixus();
+}
+
+void
+endtimer(u64 timer, char const *name)
+{
+	u64 d = unixus() - timer;
+	fprintf(stderr, "profile: %s: %llu\n", name, (unsigned long long)d);
+}

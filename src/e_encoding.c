@@ -205,7 +205,7 @@ e_frommem(OUT e_char_t *ch, u8 const *p)
 i32
 e_putch(e_char_t ch)
 {
-	return e_fputch(ch, stdout);
+	return fwrite(ch.enc, 1, sizeof(ch.enc), stdout) != sizeof(ch.enc);
 }
 
 i32

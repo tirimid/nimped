@@ -1,5 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+// use for microsecond profiling.
+// compile with -DPROFILE to enable.
+#ifdef PROFILE
+#define NEWTIMER(timer) u64 timer
+#define BEGINTIMER(timer) begintimer(&timer)
+#define ENDTIMER(timer, name) endtimer(timer, name)
+#else
+#define NEWTIMER(timer)
+#define BEGINTIMER(timer)
+#define ENDTIMER(timer, name)
+#endif
+
 #define OUT
 
 typedef int8_t i8;
@@ -25,3 +37,6 @@ char const *fileext(char const *path);
 void *hreallocarray(void *ptr, usize nmemb, usize size);
 void *hmemcpy(void *dst, void const *src, usize n);
 void *hmemmove(void *dst, void const *src, usize n);
+u64 unixus(void);
+void begintimer(OUT u64 *timer);
+void endtimer(u64 timer, char const *name);

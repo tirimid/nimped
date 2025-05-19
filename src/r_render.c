@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+static void r_applyattr(u8 fg, u8 bg);
 static void r_sigwinch(int arg);
 
 static e_char_t *r_cellchars;
@@ -183,29 +184,32 @@ r_get(OUT e_char_t *ch, OUT r_attr_t *a, u32 x, u32 y)
 void
 r_present(void)
 {
+	NEWTIMER(profile);
+	BEGINTIMER(profile);
+	
 	// allow cursor to be drawn on newline if width is exceeded.
 	u32 barh = r_barh + ((u32)p_prompt.csr >= p_prompt.len && p_prompt.csr % r_w == 0);
 	
 	r_attr_t a = {0};
-	printf("\r\x1b[38;5;0m\x1b[48;5;0m");
+	fputs("\r\x1b[0m", stdout);
 	
 	for (usize i = 0; i < r_w * (r_h - barh); ++i)
 	{
 		if (r_cellattrs[i].fg != a.fg || r_cellattrs[i].bg != a.bg)
 		{
 			a = r_cellattrs[i];
-			printf("\x1b[38;5;%um\x1b[48;5;%um", a.fg, a.bg);
+			r_applyattr(a.fg, a.bg);
 		}
 		
 		e_putch(r_cellchars[i]);
 	}
 	
-	printf("\x1b[38;5;%um\x1b[48;5;%um", o_opts.globalfg, o_opts.globalbg);
+	r_applyattr(o_opts.globalfg, o_opts.globalbg);
 	for (usize i = 0; i < r_w * barh; ++i)
 	{
 		if ((i64)i == p_prompt.csr)
 		{
-			printf("\x1b[38;5;%um\x1b[48;5;%um", o_opts.csrfg, o_opts.csrbg);
+			r_applyattr(o_opts.csrfg, o_opts.csrbg);
 		}
 		
 		if (i < r_barlen)
@@ -214,14 +218,16 @@ r_present(void)
 		}
 		else
 		{
-			printf(" ");
+			fputc(' ', stdout);
 		}
 		
 		if ((i64)i == p_prompt.csr)
 		{
-			printf("\x1b[38;5;%um\x1b[48;5;%um", o_opts.globalfg, o_opts.globalbg);
+			r_applyattr(o_opts.globalfg, o_opts.globalbg);
 		}
 	}
+	
+	ENDTIMER(profile, "render: present");
 }
 
 void
@@ -256,6 +262,28 @@ r_setbarstr(char const *s)
 	
 	r_barh = (r_barlen + r_w - 1) / r_w;
 	r_barh += !r_barh;
+}
+
+static void
+r_applyattr(u8 fg, u8 bg)
+{
+	u8 fg0 = fg % 10;
+	u8 fg1 = fg / 10 % 10;
+	u8 fg2 = fg / 100;
+	
+	u8 bg0 = bg % 10;
+	u8 bg1 = bg / 10 % 10;
+	u8 bg2 = bg / 100;
+	
+	char buf[] = "\x1b[38;5;000m\x1b[48;5;000m\0";
+	buf[7] += fg2;
+	buf[8] += fg1;
+	buf[9] += fg0;
+	buf[18] += bg2;
+	buf[19] += bg1;
+	buf[20] += bg0;
+	
+	fputs(buf, stdout);
 }
 
 static void
