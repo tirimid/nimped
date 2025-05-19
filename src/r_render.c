@@ -191,7 +191,7 @@ r_present(void)
 	u32 barh = r_barh + ((u32)p_prompt.csr >= p_prompt.len && p_prompt.csr % r_w == 0);
 	
 	r_attr_t a = {0};
-	fputs("\r\x1b[0m", stdout);
+	fputs("\x1b[H\x1b[0m", stdout);
 	
 	for (usize i = 0; i < r_w * (r_h - barh); ++i)
 	{
