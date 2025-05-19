@@ -150,7 +150,7 @@ f_render(f_frame_t const *f, u32 x, u32 y, u32 w, u32 h, bool active)
 		(r_attr_t){o_opts.normfg, o_opts.normbg},
 		x + linumlen + o_opts.lgutter + o_opts.rgutter,
 		y + 1,
-		w - linumlen + o_opts.lgutter + o_opts.rgutter,
+		w - linumlen - o_opts.lgutter - o_opts.rgutter,
 		h - 1
 	);
 	

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 // use for microsecond profiling.
-// compile with -DPROFILE to enable.
+// compile with -DPROFILE to enable (redirect stderr to a file when running).
 #ifdef PROFILE
 #define NEWTIMER(timer) u64 timer
 #define BEGINTIMER(timer) begintimer(&timer)
