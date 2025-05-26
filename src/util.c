@@ -134,3 +134,89 @@ endtimer(u64 timer, char const *name)
 	u64 d = unixus() - timer;
 	fprintf(stderr, "profile: %s: %llu\n", name, (unsigned long long)d);
 }
+
+i32
+recmkdir(char const *path)
+{
+	char *wd = strdup(path);
+	usize wdlen = strlen(wd);
+	if (!wdlen)
+	{
+		free(wd);
+		return 0; // not doing anything in this case isn't really an error.
+	}
+	
+	for (usize i = 0, len = 0; i < wdlen; ++i)
+	{
+		if (wd[i] != '/')
+		{
+			++len;
+			continue;
+		}
+		
+		if (!len)
+		{
+			continue;
+		}
+		
+		wd[i] = 0;
+		struct stat s;
+		if (!stat(wd, &s) && S_ISDIR(s.st_mode))
+		{
+			wd[i] = '/';
+			continue;
+		}
+		
+		mode_t pm = umask(0);
+		i32 rc = mkdir(wd, 0755);
+		umask(pm);
+		
+		if (rc)
+		{
+			free(wd);
+			return 1;
+		}
+		
+		wd[i] = '/';
+		len = 0;
+	}
+	
+	free(wd);
+	return 0;
+}
+
+i32
+mkfile(char const *path)
+{
+	struct stat s;
+	if (!stat(path, &s))
+	{
+		return !S_ISREG(s.st_mode);
+	}
+	
+	char *dir = strdup(path);
+	if (strrchr(dir, '/'))
+	{
+		strrchr(dir, '/')[1] = 0;
+	}
+	
+	// only need to create directory if it is specified in the path.
+	if (strcmp(dir, path))
+	{
+		i32 rc = recmkdir(dir);
+		free(dir);
+		if (rc)
+		{
+			return 1;
+		}
+	}
+	
+	FILE *fp = fopen(path, "wb");
+	if (!fp)
+	{
+		return 1;
+	}
+	
+	fclose(fp);
+	return 0;
+}

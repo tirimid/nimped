@@ -7,10 +7,16 @@ w_init(void)
 {
 	for (usize i = 0; i < a_args.nfiles; ++i)
 	{
+		if (a_args.create)
+		{
+			mkfile(a_args.files[i]);
+		}
+		
 		if (f_fromfile(&w_state.frames[i], a_args.files[i]))
 		{
 			return 1;
 		}
+		
 		++w_state.nframes;
 	}
 	

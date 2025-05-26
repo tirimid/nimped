@@ -40,3 +40,5 @@ void *hmemmove(void *dst, void const *src, usize n);
 u64 unixus(void);
 void begintimer(OUT u64 *timer);
 void endtimer(u64 timer, char const *name);
+i32 recmkdir(char const *path);
+i32 mkfile(char const *path);
