@@ -68,6 +68,9 @@ extern e_char_t o_bfmvstart[];
 extern e_char_t o_bfmvend[];
 extern e_char_t o_bfmvwordleft[];
 extern e_char_t o_bfmvwordright[];
+extern e_char_t o_bpcancel1[];
+extern e_char_t o_bpcancel2[]; 
+extern e_char_t o_bpcancel3[]; 
 extern e_char_t o_bpmvleft[];
 extern e_char_t o_bpmvright[];
 extern e_char_t o_bpmvstart[];
@@ -104,6 +107,9 @@ extern e_char_t o_bzoom[];
 extern e_char_t o_bgoto[];
 extern e_char_t o_brecmacro[];
 extern e_char_t o_bexecmacro[];
+extern e_char_t o_byes[];
+extern e_char_t o_bno[];
+extern e_char_t o_bcancel[];
 
 typedef struct o_opts
 {

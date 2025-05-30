@@ -27,6 +27,9 @@ e_char_t o_bfmvstart[] = {O_K('a'), O_KEND};
 e_char_t o_bfmvend[] = {O_K('e'), O_KEND};
 e_char_t o_bfmvwordleft[] = {O_K('b'), O_KEND};
 e_char_t o_bfmvwordright[] = {O_K('f'), O_KEND};
+e_char_t o_bpcancel1[] = {O_KCTL('x'), O_KEND};
+e_char_t o_bpcancel2[] = {O_KCTL('c'), O_KEND};
+e_char_t o_bpcancel3[] = {O_KCTL('g'), O_KEND};
 e_char_t o_bpmvleft[] = {O_KCTL('b'), O_KEND};
 e_char_t o_bpmvright[] = {O_KCTL('f'), O_KEND};
 e_char_t o_bpmvstart[] = {O_KCTL('a'), O_KEND};
@@ -63,6 +66,9 @@ e_char_t o_bzoom[] = {O_K('z'), O_KEND};
 e_char_t o_bgoto[] = {O_K('g'), O_KEND};
 e_char_t o_brecmacro[] = {O_KFN(3), O_KEND};
 e_char_t o_bexecmacro[] = {O_KFN(4), O_KEND};
+e_char_t o_byes[] = {O_K('y'), O_KEND};
+e_char_t o_bno[] = {O_K('n'), O_KEND};
+e_char_t o_bcancel[] = {O_K(27), O_KEND};
 
 o_opts_t o_opts;
 

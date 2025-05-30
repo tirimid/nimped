@@ -116,7 +116,9 @@ void
 b_installprompt(void)
 {
 	i_unbind();
-	i_bind(o_bquit, b_quitpromptfail);
+	i_bind(o_bpcancel3, b_quitpromptfail);
+	i_bind(o_bpcancel2, b_quitpromptfail);
+	i_bind(o_bpcancel1, b_quitpromptfail);
 	i_bind(o_bnewline, b_quitpromptsuccess);
 	i_bind(o_bpmvleft, b_pmvleft);
 	i_bind(o_bpmvright, b_pmvright);
@@ -140,7 +142,9 @@ void
 b_installpathprompt(void)
 {
 	i_unbind();
-	i_bind(o_bquit, b_quitpromptfail);
+	i_bind(o_bpcancel3, b_quitpromptfail);
+	i_bind(o_bpcancel2, b_quitpromptfail);
+	i_bind(o_bpcancel1, b_quitpromptfail);
 	i_bind(o_bnewline, b_quitpromptsuccess);
 	i_bind(o_bpmvleft, b_pmvleft);
 	i_bind(o_bpmvright, b_pmvright);
@@ -165,8 +169,9 @@ void
 b_installconfirmprompt(void)
 {
 	i_unbind();
-	i_bind(o_bquit, b_quitpromptfail);
-	i_bind(o_bnewline, b_quitpromptsuccess);
+	i_bind(o_byes, b_quitpromptsuccess);
+	i_bind(o_bno, b_quitpromptfail);
+	i_bind(o_bcancel, b_quitpromptfail);
 	i_organize();
 	
 	w_state.writeinput = false;
@@ -176,7 +181,9 @@ void
 b_installnumberprompt(void)
 {
 	i_unbind();
-	i_bind(o_bquit, b_quitpromptfail);
+	i_bind(o_bpcancel3, b_quitpromptfail);
+	i_bind(o_bpcancel2, b_quitpromptfail);
+	i_bind(o_bpcancel1, b_quitpromptfail);
 	i_bind(o_bnewline, b_quitpromptsuccess);
 	i_bind(o_bpmvleft, b_pmvleft);
 	i_bind(o_bpmvright, b_pmvright);
@@ -355,9 +362,9 @@ b_quit(void)
 		}
 		
 		b_installconfirmprompt();
-		p_beginstr("frames have unsaved changes, quit anyway?");
+		p_beginstr("frames have unsaved changes, quit anyway? (y/n)");
 		p_prompt.csr = -1;
-		while (!p_prompt.rc)
+		while(p_prompt.rc == 0)
 		{
 			w_render();
 			p_render();
@@ -627,9 +634,9 @@ b_killframe(void)
 	}
 	
 	b_installconfirmprompt();
-	p_beginstr("frame has unsaved changes, kill anyway?");
+	p_beginstr("frame has unsaved changes, kill anyway? (y/n)");
 	p_prompt.csr = -1;
-	while (!p_prompt.rc)
+	while(p_prompt.rc == 0)
 	{
 		w_render();
 		p_render();
@@ -661,7 +668,7 @@ b_save(void)
 	
 	b_installpathprompt();
 	p_beginstr("save as: ");
-	while (!p_prompt.rc)
+	while(p_prompt.rc == 0)
 	{
 		w_render();
 		p_render();
@@ -723,7 +730,7 @@ b_openfile(void)
 	
 	b_installpathprompt();
 	p_beginstr("open file: ");
-	while (!p_prompt.rc)
+	while(p_prompt.rc == 0)
 	{
 		w_render();
 		p_render();
@@ -735,7 +742,7 @@ b_openfile(void)
 			p_writech(k, p_prompt.csr);
 			p_prompt.csr += p_prompt.csr < O_MAXPROMPTLEN;
 		}
-	}
+    }
 	p_end();
 	b_installbase();
 	
@@ -780,7 +787,7 @@ b_search(void)
 {
 	b_installprompt();
 	p_beginstr("search literally: ");
-	while (!p_prompt.rc)
+	while(p_prompt.rc == 0)
 	{
 		w_render();
 		p_render();
@@ -837,7 +844,7 @@ b_revsearch(void)
 {
 	b_installprompt();
 	p_beginstr("reverse search literally: ");
-	while (!p_prompt.rc)
+	while(p_prompt.rc == 0)
 	{
 		w_render();
 		p_render();
@@ -1037,7 +1044,7 @@ b_ncopyline(void)
 {
 	b_installnumberprompt();
 	p_beginstr("copy lines: ");
-	while (!p_prompt.rc)
+	while(p_prompt.rc == 0)
 	{
 		w_render();
 		p_render();
@@ -1097,7 +1104,7 @@ b_ncutline(void)
 {
 	b_installnumberprompt();
 	p_beginstr("cut lines: ");
-	while (!p_prompt.rc)
+	while(p_prompt.rc == 0)
 	{
 		w_render();
 		p_render();
@@ -1172,7 +1179,7 @@ b_goto(void)
 {
 	b_installnumberprompt();
 	p_beginstr("goto line: ");
-	while (!p_prompt.rc)
+	while(p_prompt.rc == 0)
 	{
 		w_render();
 		p_render();
