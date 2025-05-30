@@ -52,10 +52,6 @@ static void b_goto(void);
 static void b_recmacro(void);
 static void b_execmacro(void);
 
-bool b_iscancel(e_char_t ch) {
-    return ch.codepoint == 27 || ch.codepoint == 3 || ch.codepoint == 7;
-}
-
 void
 b_installbase(void)
 {
@@ -120,7 +116,9 @@ void
 b_installprompt(void)
 {
 	i_unbind();
-	i_bind(o_bquit, b_quitpromptfail);
+	i_bind(o_bpcancel3, b_quitpromptfail);
+	i_bind(o_bpcancel2, b_quitpromptfail);
+	i_bind(o_bpcancel1, b_quitpromptfail);
 	i_bind(o_bnewline, b_quitpromptsuccess);
 	i_bind(o_bpmvleft, b_pmvleft);
 	i_bind(o_bpmvright, b_pmvright);
@@ -144,7 +142,9 @@ void
 b_installpathprompt(void)
 {
 	i_unbind();
-	i_bind(o_bquit, b_quitpromptfail);
+	i_bind(o_bpcancel3, b_quitpromptfail);
+	i_bind(o_bpcancel2, b_quitpromptfail);
+	i_bind(o_bpcancel1, b_quitpromptfail);
 	i_bind(o_bnewline, b_quitpromptsuccess);
 	i_bind(o_bpmvleft, b_pmvleft);
 	i_bind(o_bpmvright, b_pmvright);
@@ -181,7 +181,9 @@ void
 b_installnumberprompt(void)
 {
 	i_unbind();
-	i_bind(o_bquit, b_quitpromptfail);
+	i_bind(o_bpcancel3, b_quitpromptfail);
+	i_bind(o_bpcancel2, b_quitpromptfail);
+	i_bind(o_bpcancel1, b_quitpromptfail);
 	i_bind(o_bnewline, b_quitpromptsuccess);
 	i_bind(o_bpmvleft, b_pmvleft);
 	i_bind(o_bpmvright, b_pmvright);
@@ -362,7 +364,7 @@ b_quit(void)
 		b_installconfirmprompt();
 		p_beginstr("frames have unsaved changes, quit anyway? (y/n)");
 		p_prompt.csr = -1;
-		while (!p_prompt.rc)
+		while(p_prompt.rc == 0)
 		{
 			w_render();
 			p_render();
@@ -387,6 +389,8 @@ b_quit(void)
 static void
 b_quitpromptfail(void)
 {
+    fprintf(stderr, "Prompt failed");
+    fflush(stderr);
 	p_prompt.rc = P_FAIL;
 }
 
@@ -634,7 +638,7 @@ b_killframe(void)
 	b_installconfirmprompt();
 	p_beginstr("frame has unsaved changes, kill anyway? (y/n)");
 	p_prompt.csr = -1;
-	while (!p_prompt.rc)
+    while(p_prompt.rc == 0)
 	{
 		w_render();
 		p_render();
@@ -666,7 +670,7 @@ b_save(void)
 	
 	b_installpathprompt();
 	p_beginstr("save as: ");
-	while (!p_prompt.rc)
+    while(p_prompt.rc == 0)
 	{
 		w_render();
 		p_render();
@@ -728,18 +732,13 @@ b_openfile(void)
 	
 	b_installpathprompt();
 	p_beginstr("open file: ");
-	while (!p_prompt.rc)
+    while(p_prompt.rc == 0)
 	{
 		w_render();
 		p_render();
 		r_present();
 		
-		e_char_t k = i_readrawkey();
-        if(b_iscancel(k)) {
-            p_end();
-            b_installbase();
-            return;
-        }
+		e_char_t k = i_readkey();
         if (p_iswritable(k))
 		{
 			p_writech(k, p_prompt.csr);
@@ -790,18 +789,13 @@ b_search(void)
 {
 	b_installprompt();
 	p_beginstr("search literally: ");
-	while (!p_prompt.rc)
+    while(p_prompt.rc == 0)
 	{
 		w_render();
 		p_render();
 		r_present();
 		
-		e_char_t k = i_readrawkey();
-        if(b_iscancel(k)) {
-            p_end();
-            b_installbase();
-            return;
-        }
+		e_char_t k = i_readkey();
 		if (p_iswritable(k))
 		{
 			p_writech(k, p_prompt.csr);
@@ -852,18 +846,13 @@ b_revsearch(void)
 {
 	b_installprompt();
 	p_beginstr("reverse search literally: ");
-	while (!p_prompt.rc)
+    while(p_prompt.rc == 0)
 	{
 		w_render();
 		p_render();
 		r_present();
 		
-		e_char_t k = i_readrawkey();
-        if(b_iscancel(k)) {
-            p_end();
-            b_installbase();
-            return;
-        }
+		e_char_t k = i_readkey();
 		if (p_iswritable(k))
 		{
 			p_writech(k, p_prompt.csr);
@@ -1057,18 +1046,13 @@ b_ncopyline(void)
 {
 	b_installnumberprompt();
 	p_beginstr("copy lines: ");
-	while (!p_prompt.rc)
+    while(p_prompt.rc == 0)
 	{
 		w_render();
 		p_render();
 		r_present();
 		
-		e_char_t k = i_readrawkey();
-        if(b_iscancel(k)) {
-            p_end();
-            b_installbase();
-            return;
-        }
+		e_char_t k = i_readkey();
 		if (k.codepoint < 128 && isdigit(k.codepoint))
 		{
 			p_writech(k, p_prompt.csr);
@@ -1122,18 +1106,13 @@ b_ncutline(void)
 {
 	b_installnumberprompt();
 	p_beginstr("cut lines: ");
-	while (!p_prompt.rc)
+    while(p_prompt.rc == 0)
 	{
 		w_render();
 		p_render();
 		r_present();
 		
-		e_char_t k = i_readrawkey();
-        if(b_iscancel(k)) {
-            p_end();
-            b_installbase();
-            return;
-        }
+		e_char_t k = i_readkey();
 		if (k.codepoint < 128 && isdigit(k.codepoint))
 		{
 			p_writech(k, p_prompt.csr);
@@ -1202,18 +1181,13 @@ b_goto(void)
 {
 	b_installnumberprompt();
 	p_beginstr("goto line: ");
-	while (!p_prompt.rc)
+    while(p_prompt.rc == 0)
 	{
 		w_render();
 		p_render();
 		r_present();
 		
-		e_char_t k = i_readrawkey();
-        if(b_iscancel(k)) {
-            p_end();
-            b_installbase();
-            return;
-        }
+		e_char_t k = i_readkey();
 		if (k.codepoint < 128 && isdigit(k.codepoint))
 		{
 			p_writech(k, p_prompt.csr);
