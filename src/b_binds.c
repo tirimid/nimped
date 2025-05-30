@@ -389,8 +389,6 @@ b_quit(void)
 static void
 b_quitpromptfail(void)
 {
-    fprintf(stderr, "Prompt failed");
-    fflush(stderr);
 	p_prompt.rc = P_FAIL;
 }
 
