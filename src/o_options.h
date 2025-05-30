@@ -29,20 +29,13 @@
 	"\t|_| |_|_|_| |_| |_| .__/ \\___|\\__,_|\n" \
 	"\t                  |_|\n" \
 	"\n" \
-	"Welcome to the new and improved text editor by Tirimid - nimped.\n" \
-	"\n" \
-	"This text editor was created in order to improve upon my previous text\n" \
-	"editor, medioed, with a somewhat different design philosophy. Just like\n" \
-	"medioed, this program will always be Free Software, licensed under the\n" \
-	"GNU GPLv3, for the benefit of users and those wishing to study it. It\n" \
-	"was created for my personal use, but you are free to use it too.\n" \
-	"\n" \
-	"Additional resources:\n" \
+	"Resources:\n" \
 	"\n" \
 	"\tSource code: https://git.tirimid.net/nimped\n" \
 	"\tWriteup and docs: https://tirimid.net/tirimid/nimped.html\n" \
+	"\tPress C-h to bring up a link to the cheatsheet\n" \
 	"\n" \
-	"(The greeter logo seen above was generated with the use of Figlet)\n"
+	"This program is Free Software licensed under GNU GPLv3.\n"
 
 // visual options.
 #define O_MARGINCHAR '|'
@@ -68,9 +61,6 @@ extern e_char_t o_bfmvstart[];
 extern e_char_t o_bfmvend[];
 extern e_char_t o_bfmvwordleft[];
 extern e_char_t o_bfmvwordright[];
-extern e_char_t o_bpcancel1[];
-extern e_char_t o_bpcancel2[]; 
-extern e_char_t o_bpcancel3[]; 
 extern e_char_t o_bpmvleft[];
 extern e_char_t o_bpmvright[];
 extern e_char_t o_bpmvstart[];
@@ -78,6 +68,7 @@ extern e_char_t o_bpmvend[];
 extern e_char_t o_bpmvwordleft[];
 extern e_char_t o_bpmvwordright[];
 extern e_char_t o_bquit[];
+extern e_char_t o_bexit[];
 extern e_char_t o_bnext[];
 extern e_char_t o_bprev[];
 extern e_char_t o_bwritemode[];
@@ -107,9 +98,9 @@ extern e_char_t o_bzoom[];
 extern e_char_t o_bgoto[];
 extern e_char_t o_brecmacro[];
 extern e_char_t o_bexecmacro[];
-extern e_char_t o_byes[];
-extern e_char_t o_bno[];
-extern e_char_t o_bcancel[];
+extern e_char_t o_bpyes[];
+extern e_char_t o_bpno[];
+extern e_char_t o_bhelp[];
 
 typedef struct o_opts
 {

@@ -51,6 +51,7 @@ static void b_zoom(void);
 static void b_goto(void);
 static void b_recmacro(void);
 static void b_execmacro(void);
+static void b_help(void);
 
 void
 b_installbase(void)
@@ -85,6 +86,7 @@ b_installbase(void)
 	i_bind(o_bgoto, b_goto);
 	i_bind(o_brecmacro, b_recmacro);
 	i_bind(o_bexecmacro, b_execmacro);
+	i_bind(o_bhelp, b_help);
 	i_organize();
 	
 	w_state.writeinput = false;
@@ -96,7 +98,7 @@ void
 b_installwrite(void)
 {
 	i_unbind();
-	i_bind(o_bquit, b_installbase);
+	i_bind(o_bexit, b_installbase);
 	i_bind(o_bdelfront, b_fdelfront);
 	i_bind(o_bdelback, b_fdelback);
 	i_bind(o_bdelword, b_fdelword);
@@ -116,9 +118,7 @@ void
 b_installprompt(void)
 {
 	i_unbind();
-	i_bind(o_bpcancel3, b_quitpromptfail);
-	i_bind(o_bpcancel2, b_quitpromptfail);
-	i_bind(o_bpcancel1, b_quitpromptfail);
+	i_bind(o_bexit, b_quitpromptfail);
 	i_bind(o_bnewline, b_quitpromptsuccess);
 	i_bind(o_bpmvleft, b_pmvleft);
 	i_bind(o_bpmvright, b_pmvright);
@@ -142,9 +142,7 @@ void
 b_installpathprompt(void)
 {
 	i_unbind();
-	i_bind(o_bpcancel3, b_quitpromptfail);
-	i_bind(o_bpcancel2, b_quitpromptfail);
-	i_bind(o_bpcancel1, b_quitpromptfail);
+	i_bind(o_bexit, b_quitpromptfail);
 	i_bind(o_bnewline, b_quitpromptsuccess);
 	i_bind(o_bpmvleft, b_pmvleft);
 	i_bind(o_bpmvright, b_pmvright);
@@ -169,9 +167,9 @@ void
 b_installconfirmprompt(void)
 {
 	i_unbind();
-	i_bind(o_byes, b_quitpromptsuccess);
-	i_bind(o_bno, b_quitpromptfail);
-	i_bind(o_bcancel, b_quitpromptfail);
+	i_bind(o_bpyes, b_quitpromptsuccess);
+	i_bind(o_bpno, b_quitpromptfail);
+	i_bind(o_bexit, b_quitpromptfail);
 	i_organize();
 	
 	w_state.writeinput = false;
@@ -181,9 +179,7 @@ void
 b_installnumberprompt(void)
 {
 	i_unbind();
-	i_bind(o_bpcancel3, b_quitpromptfail);
-	i_bind(o_bpcancel2, b_quitpromptfail);
-	i_bind(o_bpcancel1, b_quitpromptfail);
+	i_bind(o_bexit, b_quitpromptfail);
 	i_bind(o_bnewline, b_quitpromptsuccess);
 	i_bind(o_bpmvleft, b_pmvleft);
 	i_bind(o_bpmvright, b_pmvright);
@@ -742,7 +738,7 @@ b_openfile(void)
 			p_writech(k, p_prompt.csr);
 			p_prompt.csr += p_prompt.csr < O_MAXPROMPTLEN;
 		}
-    }
+	}
 	p_end();
 	b_installbase();
 	
@@ -1250,4 +1246,11 @@ b_execmacro(void)
 		showinfo("binds: executing macro");
 		i_execmacro();
 	}
+}
+
+static void
+b_help(void)
+{
+	// TODO: implement help menu for user.
+	showinfo("binds: help information is not implemented yet");
 }
