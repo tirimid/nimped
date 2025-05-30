@@ -638,7 +638,7 @@ b_killframe(void)
 	b_installconfirmprompt();
 	p_beginstr("frame has unsaved changes, kill anyway? (y/n)");
 	p_prompt.csr = -1;
-    while(p_prompt.rc == 0)
+	while(p_prompt.rc == 0)
 	{
 		w_render();
 		p_render();
@@ -670,7 +670,7 @@ b_save(void)
 	
 	b_installpathprompt();
 	p_beginstr("save as: ");
-    while(p_prompt.rc == 0)
+	while(p_prompt.rc == 0)
 	{
 		w_render();
 		p_render();
@@ -732,14 +732,14 @@ b_openfile(void)
 	
 	b_installpathprompt();
 	p_beginstr("open file: ");
-    while(p_prompt.rc == 0)
+	while(p_prompt.rc == 0)
 	{
 		w_render();
 		p_render();
 		r_present();
 		
 		e_char_t k = i_readkey();
-        if (p_iswritable(k))
+		if (p_iswritable(k))
 		{
 			p_writech(k, p_prompt.csr);
 			p_prompt.csr += p_prompt.csr < O_MAXPROMPTLEN;
@@ -789,7 +789,7 @@ b_search(void)
 {
 	b_installprompt();
 	p_beginstr("search literally: ");
-    while(p_prompt.rc == 0)
+	while(p_prompt.rc == 0)
 	{
 		w_render();
 		p_render();
@@ -846,7 +846,7 @@ b_revsearch(void)
 {
 	b_installprompt();
 	p_beginstr("reverse search literally: ");
-    while(p_prompt.rc == 0)
+	while(p_prompt.rc == 0)
 	{
 		w_render();
 		p_render();
@@ -1046,7 +1046,7 @@ b_ncopyline(void)
 {
 	b_installnumberprompt();
 	p_beginstr("copy lines: ");
-    while(p_prompt.rc == 0)
+	while(p_prompt.rc == 0)
 	{
 		w_render();
 		p_render();
@@ -1106,7 +1106,7 @@ b_ncutline(void)
 {
 	b_installnumberprompt();
 	p_beginstr("cut lines: ");
-    while(p_prompt.rc == 0)
+	while(p_prompt.rc == 0)
 	{
 		w_render();
 		p_render();
@@ -1181,7 +1181,7 @@ b_goto(void)
 {
 	b_installnumberprompt();
 	p_beginstr("goto line: ");
-    while(p_prompt.rc == 0)
+	while(p_prompt.rc == 0)
 	{
 		w_render();
 		p_render();
