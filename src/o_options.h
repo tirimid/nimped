@@ -104,6 +104,9 @@ extern e_char_t o_bzoom[];
 extern e_char_t o_bgoto[];
 extern e_char_t o_brecmacro[];
 extern e_char_t o_bexecmacro[];
+extern e_char_t o_byes[];
+extern e_char_t o_bno[];
+extern e_char_t o_bcancel[];
 
 typedef struct o_opts
 {

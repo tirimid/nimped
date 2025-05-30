@@ -52,6 +52,10 @@ static void b_goto(void);
 static void b_recmacro(void);
 static void b_execmacro(void);
 
+bool b_iscancel(e_char_t ch) {
+    return ch.codepoint == 27 || ch.codepoint == 3 || ch.codepoint == 7;
+}
+
 void
 b_installbase(void)
 {
@@ -165,8 +169,9 @@ void
 b_installconfirmprompt(void)
 {
 	i_unbind();
-	i_bind(o_bquit, b_quitpromptfail);
-	i_bind(o_bnewline, b_quitpromptsuccess);
+	i_bind(o_byes, b_quitpromptsuccess);
+	i_bind(o_bno, b_quitpromptfail);
+	i_bind(o_bcancel, b_quitpromptfail);
 	i_organize();
 	
 	w_state.writeinput = false;
@@ -355,7 +360,7 @@ b_quit(void)
 		}
 		
 		b_installconfirmprompt();
-		p_beginstr("frames have unsaved changes, quit anyway?");
+		p_beginstr("frames have unsaved changes, quit anyway? (y/n)");
 		p_prompt.csr = -1;
 		while (!p_prompt.rc)
 		{
@@ -627,7 +632,7 @@ b_killframe(void)
 	}
 	
 	b_installconfirmprompt();
-	p_beginstr("frame has unsaved changes, kill anyway?");
+	p_beginstr("frame has unsaved changes, kill anyway? (y/n)");
 	p_prompt.csr = -1;
 	while (!p_prompt.rc)
 	{
@@ -729,13 +734,18 @@ b_openfile(void)
 		p_render();
 		r_present();
 		
-		e_char_t k = i_readkey();
-		if (p_iswritable(k))
+		e_char_t k = i_readrawkey();
+        if(b_iscancel(k)) {
+            p_end();
+            b_installbase();
+            return;
+        }
+        if (p_iswritable(k))
 		{
 			p_writech(k, p_prompt.csr);
 			p_prompt.csr += p_prompt.csr < O_MAXPROMPTLEN;
 		}
-	}
+    }
 	p_end();
 	b_installbase();
 	
@@ -786,7 +796,12 @@ b_search(void)
 		p_render();
 		r_present();
 		
-		e_char_t k = i_readkey();
+		e_char_t k = i_readrawkey();
+        if(b_iscancel(k)) {
+            p_end();
+            b_installbase();
+            return;
+        }
 		if (p_iswritable(k))
 		{
 			p_writech(k, p_prompt.csr);
@@ -843,7 +858,12 @@ b_revsearch(void)
 		p_render();
 		r_present();
 		
-		e_char_t k = i_readkey();
+		e_char_t k = i_readrawkey();
+        if(b_iscancel(k)) {
+            p_end();
+            b_installbase();
+            return;
+        }
 		if (p_iswritable(k))
 		{
 			p_writech(k, p_prompt.csr);
@@ -1043,7 +1063,12 @@ b_ncopyline(void)
 		p_render();
 		r_present();
 		
-		e_char_t k = i_readkey();
+		e_char_t k = i_readrawkey();
+        if(b_iscancel(k)) {
+            p_end();
+            b_installbase();
+            return;
+        }
 		if (k.codepoint < 128 && isdigit(k.codepoint))
 		{
 			p_writech(k, p_prompt.csr);
@@ -1103,7 +1128,12 @@ b_ncutline(void)
 		p_render();
 		r_present();
 		
-		e_char_t k = i_readkey();
+		e_char_t k = i_readrawkey();
+        if(b_iscancel(k)) {
+            p_end();
+            b_installbase();
+            return;
+        }
 		if (k.codepoint < 128 && isdigit(k.codepoint))
 		{
 			p_writech(k, p_prompt.csr);
@@ -1178,7 +1208,12 @@ b_goto(void)
 		p_render();
 		r_present();
 		
-		e_char_t k = i_readkey();
+		e_char_t k = i_readrawkey();
+        if(b_iscancel(k)) {
+            p_end();
+            b_installbase();
+            return;
+        }
 		if (k.codepoint < 128 && isdigit(k.codepoint))
 		{
 			p_writech(k, p_prompt.csr);
