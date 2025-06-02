@@ -33,9 +33,79 @@
 	"\n" \
 	"\tSource code: https://git.tirimid.net/nimped\n" \
 	"\tWriteup and docs: https://tirimid.net/tirimid/nimped.html\n" \
-	"\tPress C-h to bring up a link to the cheatsheet\n" \
+	"\tPress C-h to bring up help information\n" \
 	"\n" \
 	"This program is Free Software licensed under GNU GPLv3.\n"
+
+#define O_HELPTEXT \
+	"nimped is a modal text editor, and each mode has some associated key\n" \
+	"binds. In order to effectively use the editor, you will need to learn\n" \
+	"these (when the editor is opened, it starts in base mode):\n" \
+	"\n" \
+	"Base mode:\n" \
+	"\n" \
+	"\th          Move left one character\n" \
+	"\tl          Move right one character\n" \
+	"\tj          Move down one line\n" \
+	"\tk          Move up one line\n" \
+	"\ta          Move to the start of the current line\n" \
+	"\te          Move to the end of the current line\n" \
+	"\tf          Move forward one word\n" \
+	"\tb          Move backward one word\n" \
+	"\tC-x C-c    Quit nimped\n" \
+	"\tC-n        Create a new scratch frame\n" \
+	"\tC-f        Create a frame from a file\n" \
+	"\tC-k        Kill the current frame\n" \
+	"\tC-s        Save the contents of the current frame to a file\n" \
+	"\tn          Goto the next frame\n" \
+	"\tp          Goto the previous frame\n" \
+	"\tm          Set the current frame as master\n" \
+	"\tu          Undo the last changes made to a frame\n" \
+	"\t/          Search the frame forwards for literal text\n" \
+	"\t?          Search the frame backwards for literal text\n" \
+	"\tc          Copy the current line\n" \
+	"\td          Cut the current line\n" \
+	"\tq c        Copy a given number of lines\n" \
+	"\tq d        Cut a given number of lines\n" \
+	"\tv          Paste the clipboard contents\n" \
+	"\tz          Center the frame around the cursor\n" \
+	"\tg          Goto a given line\n" \
+	"\tF3         Start recording a macro\n" \
+	"\tF4         Stop recording / execute a macro\n" \
+	"\ti          Enter write mode\n" \
+	"\tC-h        Display a help menu\n" \
+	"\n" \
+	"Write mode:\n" \
+	"\n" \
+	"\tC-g        Quit write mode\n" \
+	"\tC-d        Delete the character in front of the cursor\n" \
+	"\tBACKSPC    Delete the Character behind the cursor (handling smart parens)\n" \
+	"\tM-BACKSPC  Delete the word behind the cursor\n" \
+	"\tRET        Insert a new line (handling indentation and smart parens)\n" \
+	"\t(          Insert a smart left-paren\n" \
+	"\t[          Insert a smart left-bracket\n" \
+	"\t{          Insert a smart left-brace\n" \
+	"\t\"          Insert a smart double-quote\n" \
+	"\n" \
+	"Prompt mode:\n" \
+	"\n" \
+	"\tC-g        Quit prompt with failure\n" \
+	"\ty          (Confirmation prompts) quit prompt with success\n" \
+	"\tn          (Confirmation prompts) quit prompt with failure\n" \
+	"\tRET        (Text prompts) quit prompt with success\n" \
+	"\tC-f        (Text prompts) move right one character\n" \
+	"\tC-b        (Text prompts) move left one character\n" \
+	"\tC-a        (Text prompts) move to the start of the prompt\n" \
+	"\tC-e        (Text prompts) move to the end of the prompt\n" \
+	"\tM-f        (Text prompts) move forward one word\n" \
+	"\tM-b        (Text prompts) move backward one word\n" \
+	"\tC-d        (Text prompts) delete the character in front of the cursor\n" \
+	"\tBACKSPC    (Text prompts) delete the character behind the cursor (handling smart parens)\n" \
+	"\tM-BACKSPC  (Text prompts) delete the word behind the cursor\n" \
+	"\t(          (Text prompts) insert a smart left-paren\n" \
+	"\t[          (Text prompts) insert a smart left-bracket\n" \
+	"\t{          (Text prompts) insert a smart left-brace\n" \
+	"\t\"          (Text prompts) insert a smart double-quote\n"
 
 // visual options.
 #define O_MARGINCHAR '|'

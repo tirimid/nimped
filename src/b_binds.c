@@ -1251,6 +1251,12 @@ b_execmacro(void)
 static void
 b_help(void)
 {
-	// TODO: implement help menu for user.
-	showinfo("binds: help information is not implemented yet");
+	if (w_state.nframes >= O_MAXFILES)
+	{
+		showerr("binds: cannot open more than %u frames, kill some using C-k!", O_MAXFILES);
+		return;
+	}
+	
+	w_state.frames[w_state.nframes++] = f_fromstr(O_HELPTEXT);
+	w_state.curframe = w_state.nframes - 1;
 }
