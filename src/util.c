@@ -54,7 +54,7 @@ fileid(char const *path, bool deref)
 	struct stat stat;
 	if (statfn[deref](path, &stat))
 	{
-		return 1;
+		return 0;
 	}
 	
 	return stat.st_ino;
