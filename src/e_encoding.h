@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #define E_REPLACEMENT 0xfffd
+#define E_EMDASH 0x2014
 
 typedef struct e_char
 {

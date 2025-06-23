@@ -86,6 +86,7 @@
 	"\t[          Insert a smart left-bracket\n" \
 	"\t{          Insert a smart left-brace\n" \
 	"\t\"          Insert a smart double-quote\n" \
+	"\tM--        Insert an emdash\n" \
 	"\n" \
 	"Prompt mode:\n" \
 	"\n" \
@@ -171,6 +172,7 @@ extern e_char_t o_bexecmacro[];
 extern e_char_t o_bpyes[];
 extern e_char_t o_bpno[];
 extern e_char_t o_bhelp[];
+extern e_char_t o_bemdash[];
 
 typedef struct o_opts
 {

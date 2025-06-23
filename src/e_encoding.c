@@ -86,20 +86,20 @@ e_fromcodepoint(u32 codepoint)
 	}
 	else if (codepoint < 0x800)
 	{
-		ch.enc[0] = 0xc0 | (codepoint & 0x7c0);
+		ch.enc[0] = 0xc0 | (codepoint & 0x7c0) >> 6;
 		ch.enc[1] = 0x80 | (codepoint & 0x3f);
 	}
 	else if (codepoint < 0x10000)
 	{
-		ch.enc[0] = 0xe0 | (codepoint & 0xf000);
-		ch.enc[1] = 0x80 | (codepoint & 0xfc0);
+		ch.enc[0] = 0xe0 | (codepoint & 0xf000) >> 12;
+		ch.enc[1] = 0x80 | (codepoint & 0xfc0) >> 6;
 		ch.enc[2] = 0x80 | (codepoint & 0x3f);
 	}
 	else if (codepoint < 0x11000)
 	{
-		ch.enc[0] = 0xf0 | (codepoint & 0x1c0000);
-		ch.enc[1] = 0x80 | (codepoint & 0x3f000);
-		ch.enc[2] = 0x80 | (codepoint & 0xfc0);
+		ch.enc[0] = 0xf0 | (codepoint & 0x1c0000) >> 18;
+		ch.enc[1] = 0x80 | (codepoint & 0x3f000) >> 12;
+		ch.enc[2] = 0x80 | (codepoint & 0xfc0) >> 6;
 		ch.enc[3] = 0x80 | (codepoint & 0x3f);
 	}
 	else
