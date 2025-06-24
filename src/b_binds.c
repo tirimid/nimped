@@ -52,7 +52,6 @@ static void b_goto(void);
 static void b_recmacro(void);
 static void b_execmacro(void);
 static void b_help(void);
-static void b_femdash(void);
 
 void
 b_installbase(void)
@@ -108,7 +107,6 @@ b_installwrite(void)
 	i_bind(o_bleftbracket, b_fleftbracket);
 	i_bind(o_bleftbrace, b_fleftbrace);
 	i_bind(o_bdoublequote, b_fdoublequote);
-	i_bind(o_bemdash, b_femdash);
 	i_organize();
 	
 	w_state.writeinput = true;
@@ -1261,13 +1259,4 @@ b_help(void)
 	
 	w_state.frames[w_state.nframes++] = f_fromstr(O_HELPTEXT);
 	w_state.curframe = w_state.nframes - 1;
-}
-
-static void
-b_femdash(void)
-{
-	f_frame_t *f = &w_state.frames[w_state.curframe];
-	f_writech(f, e_fromcodepoint(E_EMDASH), f->csr);
-	++f->csr;
-	f_savecsr(f);
 }

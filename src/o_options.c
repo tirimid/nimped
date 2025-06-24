@@ -67,7 +67,6 @@ e_char_t o_bexecmacro[] = {O_KFN(4), O_KEND};
 e_char_t o_bpyes[] = {O_K('y'), O_KEND};
 e_char_t o_bpno[] = {O_K('n'), O_KEND};
 e_char_t o_bhelp[] = {O_KCTL('h'), O_KEND};
-e_char_t o_bemdash[] = {O_KMETA('-'), O_KEND};
 
 o_opts_t o_opts;
 
