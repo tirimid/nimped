@@ -243,6 +243,7 @@ o_parse(void)
 	o_readlangconf(fp, "ckeyword", "cprimitive", O_CMODE);
 	o_readlangconf(fp, "shkeyword", "shprimitive", O_SHMODE);
 	o_readlangconf(fp, "jskeyword", "jsprimitive", O_JSMODE);
+	o_readlangconf(fp, "cckeyword", "ccprimitive", O_CCMODE);
 	
 	fclose(fp);
 	return 0;

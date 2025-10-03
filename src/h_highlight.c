@@ -11,6 +11,9 @@
 #define H_JSSPECIAL "()[]{};=+-*/%<>&^|?!~:,."
 #define H_JSWORDINIT "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_$"
 #define H_JSWORD "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_$0123456789"
+#define H_CCSPECIAL "!%&()*+,-./:;<=>?[\\]^{|}~"
+#define H_CCWORDINIT "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"
+#define H_CCWORD "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
 
 static bool h_cmpstr(f_frame_t const *f, char const *cmp, u32 at);
 static bool h_cmpany(f_frame_t const *f, char const *cmp, u32 at);
@@ -24,6 +27,7 @@ static void h_ccomment(OUT h_region_t *r, f_frame_t const *f, u32 from);
 static void h_cword(OUT h_region_t *r, f_frame_t const *f, u32 from);
 static void h_shword(OUT h_region_t *r, f_frame_t const *f, u32 from);
 static void h_jsword(OUT h_region_t *r, f_frame_t const *f, u32 from);
+static void h_ccword(OUT h_region_t *r, f_frame_t const *f, u32 from);
 
 void
 h_find(OUT h_region_t *r, f_frame_t const *f, u32 from)
@@ -42,6 +46,10 @@ h_find(OUT h_region_t *r, f_frame_t const *f, u32 from)
 	if (!strcmp(ext, "c") || !strcmp(ext, "h"))
 	{
 		h_findc(r, f, from);
+	}
+	else if (!strcmp(ext, "cc") || !strcmp(ext, "hh"))
+	{
+		h_findcc(r, f, from);
 	}
 	else if (!strcmp(ext, "sh"))
 	{
@@ -189,6 +197,55 @@ h_findjs(OUT h_region_t *r, f_frame_t const *f, u32 from)
 		else if (h_cmpany(f, H_JSSPECIAL, i))
 		{
 			h_special(r, f, i, H_JSSPECIAL);
+			return;
+		}
+	}
+	
+	*r = (h_region_t)
+	{
+		.lb = f->len,
+		.ub = f->len
+	};
+}
+
+void
+h_findcc(OUT h_region_t *r, f_frame_t const *f, u32 from)
+{
+	for (u32 i = from; i < f->len; ++i)
+	{
+		if (h_cmpstr(f, "//", i))
+		{
+			h_linecomment(r, f, i);
+			return;
+		}
+		else if (h_cmpstr(f, "/*", i))
+		{
+			h_ccomment(r, f, i);
+			return;
+		}
+		else if (h_cmpany(f, H_NUMBERINIT, i))
+		{
+			h_number(r, f, i);
+			return;
+		}
+		else if (h_cmpstr(f, "#", i))
+		{
+			h_cpreproc(r, f, i);
+			return;
+		}
+		else if (h_cmpany(f, H_CCSPECIAL, i))
+		{
+			h_special(r, f, i, H_CCSPECIAL);
+			return;
+		}
+		else if (h_cmpany(f, H_CCWORDINIT, i))
+		{
+			h_ccword(r, f, i);
+			return;
+		}
+		else if (h_cmpany(f, "\"'", i))
+		{
+			h_string(r, f, i, true, false);
 			return;
 		}
 	}
@@ -514,6 +571,78 @@ h_jsword(OUT h_region_t *r, f_frame_t const *f, u32 from)
 	}
 	
 	if (isupper(f->buf[from].codepoint))
+	{
+		r->fg = o_opts.emphfg;
+		r->bg = o_opts.emphbg;
+		return;
+	}
+	
+	r->fg = o_opts.normfg;
+	r->bg = o_opts.normbg;
+}
+
+static void
+h_ccword(OUT h_region_t *r, f_frame_t const *f, u32 from)
+{
+	i32 nlower = 0;
+	u32 end = from;
+	while (end < f->len && strchr(H_CCWORD, f->buf[end].codepoint))
+	{
+		nlower += islower(f->buf[end].codepoint);
+		++end;
+	}
+	
+	*r = (h_region_t)
+	{
+		.lb = from,
+		.ub = end
+	};
+	
+	if (h_trykeyword(r, f, from, end, O_CCMODE))
+	{
+		return;
+	}
+	
+	if (end - from >= 2
+		&& f->buf[end - 1].codepoint == 't'
+		&& f->buf[end - 2].codepoint == '_')
+	{
+		r->fg = o_opts.typefg;
+		r->bg = o_opts.typebg;
+		return;
+	}
+	
+	if (!nlower)
+	{
+		r->fg = o_opts.macrofg;
+		r->bg = o_opts.macrobg;
+		return;
+	}
+	
+	u32 next = end;
+	while (next < f->len && e_isspace(f->buf[next]))
+	{
+		++next;
+	}
+	
+	// very dumb way of doing checks for template parameters; only works for "well
+	// behaved" / "well formed" code, but honestly should be good enough.
+	if (next < f->len && f->buf[next].codepoint == '<')
+	{
+		++next;
+		for (u32 nopen = 1; next < f->len && nopen; ++next)
+		{
+			nopen += f->buf[next].codepoint == '<';
+			nopen -= f->buf[next].codepoint == '>';
+		}
+	}
+	
+	while (next < f->len && e_isspace(f->buf[next]))
+	{
+		++next;
+	}
+	
+	if (next < f->len && f->buf[next].codepoint == '(')
 	{
 		r->fg = o_opts.emphfg;
 		r->bg = o_opts.emphbg;
