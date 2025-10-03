@@ -649,6 +649,13 @@ h_ccword(OUT h_region_t *r, f_frame_t const *f, u32 from)
 		return;
 	}
 	
+	if (isupper(f->buf[from].codepoint))
+	{
+		r->fg = o_opts.typefg;
+		r->bg = o_opts.typebg;
+		return;
+	}
+	
 	r->fg = o_opts.normfg;
 	r->bg = o_opts.normbg;
 }
