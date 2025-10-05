@@ -160,7 +160,19 @@ static o_namedcolor_t o_namedcolors[] =
 	{"@vsd.blue0", 152},
 	{"@vsd.blue1", 30},
 	{"@vsd.blue2", 39},
-	{"@vsd.yellow", 230}
+	{"@vsd.yellow", 230},
+	
+	// ridiculous light.
+	{"@rl.bglight", 254},
+	{"@rl.bgdark", 251},
+	{"@rl.bgnight", 249},
+	{"@rl.fglight", 237},
+	{"@rl.fgdark", 233},
+	{"@rl.blue", 21},
+	{"@rl.red", 124},
+	{"@rl.orange", 130},
+	{"@rl.aqua", 65},
+	{"@rl.green", 28}
 };
 
 i32
