@@ -172,7 +172,7 @@ static o_namedcolor_t o_namedcolors[] =
 	{"@rl.red", 124},
 	{"@rl.orange", 130},
 	{"@rl.aqua", 65},
-	{"@rl.purple", 163}
+	{"@rl.purple", 126}
 };
 
 i32
