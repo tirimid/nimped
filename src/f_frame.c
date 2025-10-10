@@ -156,13 +156,25 @@ f_render(f_frame_t const *f, u32 x, u32 y, u32 w, u32 h, bool active)
 	
 	u32 leftpad = o_opts.lgutter + linumlen + o_opts.rgutter;
 	
-	// render margin.
-	if (leftpad + o_opts.margin < w)
+	// render margins.
+	if (leftpad + o_opts.margin1 < w)
 	{
 		r_fill(
 			e_fromcodepoint(O_MARGINCHAR),
 			(r_attr_t){o_opts.marginfg, o_opts.marginbg},
-			x + leftpad + o_opts.margin,
+			x + leftpad + o_opts.margin1,
+			y + 1,
+			1,
+			h - 1
+		);
+	}
+
+	if (leftpad + o_opts.margin2 < w)
+	{
+		r_fill(
+			e_fromcodepoint(O_MARGINCHAR),
+			(r_attr_t){o_opts.marginfg, o_opts.marginbg},
+			x + leftpad + o_opts.margin2,
 			y + 1,
 			1,
 			h - 1

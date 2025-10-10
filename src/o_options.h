@@ -181,7 +181,7 @@ typedef struct o_opts
 	// layout options.
 	u32 masternum, masterdenom;
 	u32 lgutter, rgutter;
-	u32 margin;
+	u32 margin1, margin2;
 	u32 tab;
 	
 	// editor color options.

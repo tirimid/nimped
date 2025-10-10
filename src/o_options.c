@@ -191,7 +191,8 @@ o_parse(void)
 		|| o_getu32(O_LAYOUTCONF, fp, "masterdenom", &o_opts.masterdenom)
 		|| o_getu32(O_LAYOUTCONF, fp, "lgutter", &o_opts.lgutter)
 		|| o_getu32(O_LAYOUTCONF, fp, "rgutter", &o_opts.rgutter)
-		|| o_getu32(O_LAYOUTCONF, fp, "margin", &o_opts.margin)
+		|| o_getu32(O_LAYOUTCONF, fp, "margin1", &o_opts.margin1)
+		|| o_getu32(O_LAYOUTCONF, fp, "margin2", &o_opts.margin2)
 		|| o_getu32(O_LAYOUTCONF, fp, "tab", &o_opts.tab))
 	{
 		fclose(fp);
