@@ -56,3 +56,4 @@ void f_breakhist(f_frame_t *f);
 void f_savecsr(f_frame_t *f);
 void f_loadcsr(f_frame_t *f);
 void f_compbounds(f_frame_t *f, u32 w, u32 h);
+u32 f_tabulate(f_frame_t *f, u32 at);

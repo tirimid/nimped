@@ -67,6 +67,7 @@ e_char_t o_bexecmacro[] = {O_KFN(4), O_KEND};
 e_char_t o_bpyes[] = {O_K('y'), O_KEND};
 e_char_t o_bpno[] = {O_K('n'), O_KEND};
 e_char_t o_bhelp[] = {O_KCTL('h'), O_KEND};
+e_char_t o_btab[] = {O_K(9), O_KEND};
 
 o_opts_t o_opts;
 
@@ -74,6 +75,7 @@ static FILE *o_openconf(char const *file);
 static i32 o_getraw(char const *name, FILE *fp, char const *key, OUT char val[]);
 static i32 o_getu32(char const *name, FILE *fp, char const *key, OUT u32 *val);
 static i32 o_getcolor(char const *name, FILE *fp, char const *key, OUT u8 *val);
+static i32 o_getbool(char const *name, FILE *fp, char const *key, OUT bool *val);
 static bool o_nthraw(char const *name, FILE *fp, char const *key, OUT char val[], i32 n);
 static void o_readlangconf(FILE *fp, char const *kwkey, char const *primkey, o_langmode_t mode);
 
@@ -239,6 +241,20 @@ o_parse(void)
 		|| o_getcolor(O_COLORCONF, fp, "stringbg", &o_opts.stringbg)
 		|| o_getcolor(O_COLORCONF, fp, "numberfg", &o_opts.numberfg)
 		|| o_getcolor(O_COLORCONF, fp, "numberbg", &o_opts.numberbg))
+	{
+		fclose(fp);
+		return 1;
+	}
+	
+	fclose(fp);
+	fp = o_openconf(O_EDITINGCONF);
+	if (!fp)
+	{
+		return 1;
+	}
+	
+	// editing options.
+	if (o_getbool(O_EDITINGCONF, fp, "tabspaces", &o_opts.tabspaces))
 	{
 		fclose(fp);
 		return 1;
@@ -413,6 +429,32 @@ o_getcolor(char const *name, FILE *fp, char const *key, OUT u8 *val)
 	
 	*val = ull;
 	return 0;
+}
+
+static i32
+o_getbool(char const *name, FILE *fp, char const *key, OUT bool *val)
+{
+	char buf[O_CONFVALLEN] = {0};
+	if (o_getraw(name, fp, key, buf))
+	{
+		return 1;
+	}
+	
+	if (!strcmp(buf, "true"))
+	{
+		*val = true;
+		return 0;
+	}
+	else if (!strcmp(buf, "false"))
+	{
+		*val = false;
+		return 0;
+	}
+	else
+	{
+		showerr("options: invalid boolean value for %s in %s!", key, name);
+		return 1;
+	}
 }
 
 static bool

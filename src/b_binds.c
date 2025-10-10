@@ -52,6 +52,7 @@ static void b_goto(void);
 static void b_recmacro(void);
 static void b_execmacro(void);
 static void b_help(void);
+static void b_tab(void);
 
 void
 b_installbase(void)
@@ -107,6 +108,7 @@ b_installwrite(void)
 	i_bind(o_bleftbracket, b_fleftbracket);
 	i_bind(o_bleftbrace, b_fleftbrace);
 	i_bind(o_bdoublequote, b_fdoublequote);
+	i_bind(o_btab, b_tab);
 	i_organize();
 	
 	w_state.writeinput = true;
@@ -439,9 +441,35 @@ b_fdelback(void)
 		}
 	}
 	
-	--f->csr;
-	f_erase(f, f->csr, f->csr + 1);
-	f_savecsr(f);
+	if (o_opts.tabspaces && o_opts.tab != 1)
+	{
+		// deletion of tabspace indentation requires special handling.
+		--f->csr;
+		f_erase(f, f->csr, f->csr + 1);
+		
+		u32 lbegin = f->csr;
+		while (lbegin && f->buf[lbegin - 1].codepoint != '\n')
+		{
+			--lbegin;
+		}
+		
+		u32 linepos = f->csr - lbegin;
+		u32 lastindent = linepos / o_opts.tab * o_opts.tab;
+		while (linepos > lastindent && f->buf[f->csr - 1].codepoint == ' ')
+		{
+			--f->csr;
+			f_erase(f, f->csr, f->csr + 1);
+			--linepos;
+		}
+		
+		f_savecsr(f);
+	}
+	else
+	{
+		--f->csr;
+		f_erase(f, f->csr, f->csr + 1);
+		f_savecsr(f);
+	}
 }
 
 static void
@@ -531,10 +559,24 @@ b_newline(void)
 		--lbegin;
 	}
 	
-	u32 ntab = 0;
-	while (lbegin + ntab < f->len && f->buf[lbegin + ntab].codepoint == '\t')
+	u32 nindent = 0;
+	if (o_opts.tabspaces)
 	{
-		++ntab;
+		u32 nspaces = 0;
+		while (lbegin + nspaces < f->len
+			&& f->buf[lbegin + nspaces].codepoint == ' ')
+		{
+			++nspaces;
+		}
+		nindent = nspaces / o_opts.tab;
+	}
+	else
+	{
+		while (lbegin + nindent < f->len
+			&& f->buf[lbegin + nindent].codepoint == '\t')
+		{
+			++nindent;
+		}
 	}
 	
 	// unfold parentheticals.
@@ -548,10 +590,9 @@ b_newline(void)
 			f_writech(f, e_fromcodepoint('\n'), f->csr);
 			++f->csr;
 			
-			for (u32 i = 0; i < ntab + 1; ++i)
+			for (u32 i = 0; i < nindent + 1; ++i)
 			{
-				f_writech(f, e_fromcodepoint('\t'), f->csr);
-				++f->csr;
+				f->csr = f_tabulate(f, f->csr);
 			}
 			
 			f_savecsr(f);
@@ -567,10 +608,9 @@ b_newline(void)
 			f_writech(f, e_fromcodepoint('\n'), csr);
 			++csr;
 			
-			for (u32 i = 0; i < ntab; ++i)
+			for (u32 i = 0; i < nindent; ++i)
 			{
-				f_writech(f, e_fromcodepoint('\t'), csr);
-				++csr;
+				csr = f_tabulate(f, csr);
 			}
 		}
 	}
@@ -583,11 +623,10 @@ b_newline(void)
 	f_writech(f, e_fromcodepoint('\n'), f->csr);
 	++f->csr;
 	
-	while (ntab)
+	while (nindent)
 	{
-		f_writech(f, e_fromcodepoint('\t'), f->csr);
-		++f->csr;
-		--ntab;
+		f->csr = f_tabulate(f, f->csr);
+		--nindent;
 	}
 	
 	f_savecsr(f);
@@ -1259,4 +1298,12 @@ b_help(void)
 	
 	w_state.frames[w_state.nframes++] = f_fromstr(O_HELPTEXT);
 	w_state.curframe = w_state.nframes - 1;
+}
+
+static void
+b_tab(void)
+{
+	f_frame_t *f = &w_state.frames[w_state.curframe];
+	f->csr = f_tabulate(f, f->csr);
+	f_savecsr(f);
 }

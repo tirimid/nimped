@@ -593,3 +593,32 @@ f_compbounds(f_frame_t *f, u32 w, u32 h)
 		cx += cw;
 	}
 }
+
+u32
+f_tabulate(f_frame_t *f, u32 at)
+{
+	if (o_opts.tabspaces)
+	{
+		u32 lbegin = at;
+		while (lbegin && f->buf[lbegin - 1].codepoint != '\n')
+		{
+			--lbegin;
+		}
+		
+		u32 linepos = at - lbegin;
+		u32 nspaces = o_opts.tab - linepos % o_opts.tab;
+		while (nspaces)
+		{
+			f_writech(f, e_fromcodepoint(' '), at);
+			++at;
+			--nspaces;
+		}
+		
+		return at;
+	}
+	else
+	{
+		f_writech(f, e_fromcodepoint('\t'), at);
+		return at + 1;
+	}
+}

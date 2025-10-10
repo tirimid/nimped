@@ -12,6 +12,7 @@
 #define O_LAYOUTCONF "layout.conf"
 #define O_COLORCONF "color.conf"
 #define O_LANGCONF "lang.conf"
+#define O_EDITINGCONF "editing.conf"
 #define O_MAXBARLEN 512
 #define O_MAXKEYWORDS 128
 #define O_MAXPROMPTLEN 512
@@ -82,6 +83,7 @@
 	"\tBACKSPC    Delete the Character behind the cursor (handling smart parens)\n" \
 	"\tM-BACKSPC  Delete the word behind the cursor\n" \
 	"\tRET        Insert a new line (handling indentation and smart parens)\n" \
+	"\tTAB        Insert a tab character or equivalent spaces (as configured)" \
 	"\t(          Insert a smart left-paren\n" \
 	"\t[          Insert a smart left-bracket\n" \
 	"\t{          Insert a smart left-brace\n" \
@@ -172,6 +174,7 @@ extern e_char_t o_bexecmacro[];
 extern e_char_t o_bpyes[];
 extern e_char_t o_bpno[];
 extern e_char_t o_bhelp[];
+extern e_char_t o_btab[];
 
 typedef struct o_opts
 {
@@ -201,6 +204,9 @@ typedef struct o_opts
 	u8 emphfg, emphbg;
 	u8 stringfg, stringbg;
 	u8 numberfg, numberbg;
+	
+	// editing options.
+	bool tabspaces;
 	
 	// language mode options.
 	struct
