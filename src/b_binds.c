@@ -444,22 +444,25 @@ b_fdelback(void)
 	if (o_opts.tabspaces && o_opts.tab != 1)
 	{
 		// deletion of tabspace indentation requires special handling.
-		--f->csr;
+		bool done = !e_isspace(f->buf[--f->csr]);
 		f_erase(f, f->csr, f->csr + 1);
 		
-		u32 lbegin = f->csr;
-		while (lbegin && f->buf[lbegin - 1].codepoint != '\n')
+		if (!done)
 		{
-			--lbegin;
-		}
-		
-		u32 linepos = f->csr - lbegin;
-		u32 lastindent = linepos / o_opts.tab * o_opts.tab;
-		while (linepos > lastindent && f->buf[f->csr - 1].codepoint == ' ')
-		{
-			--f->csr;
-			f_erase(f, f->csr, f->csr + 1);
-			--linepos;
+			u32 lbegin = f->csr;
+			while (lbegin && f->buf[lbegin - 1].codepoint != '\n')
+			{
+				--lbegin;
+			}
+			
+			u32 linepos = f->csr - lbegin;
+			u32 lastindent = linepos / o_opts.tab * o_opts.tab;
+			while (linepos > lastindent && f->buf[f->csr - 1].codepoint == ' ')
+			{
+				--f->csr;
+				f_erase(f, f->csr, f->csr + 1);
+				--linepos;
+			}
 		}
 		
 		f_savecsr(f);
